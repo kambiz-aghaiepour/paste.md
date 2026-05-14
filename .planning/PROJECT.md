@@ -16,11 +16,12 @@ Users can quickly paste Markdown content and get a shareable link that renders i
 - ✓ Markdown rendering for paste content — Phase 2
 - ✓ Real-time Markdown preview while editing — Phase 2
 - ✓ Syntax highlighting for code blocks — Phase 2
+- ✓ Raw text view alongside rendered view — Phase 3
+- ✓ Paste expiration controls — Phase 3
 
 ### Active
 
 - [ ] Clean, minimal UI focused on content
-- [ ] Raw text view alongside rendered view
 
 ### Out of Scope
 
