@@ -32,7 +32,7 @@ export default async function PastePage({
   const remaining = paste.expiresAt ? paste.expiresAt - now : null;
 
   return (
-    <main className="mx-auto max-w-3xl p-4 sm:p-8">
+    <main className="mx-auto max-w-7xl p-4 sm:p-8">
       <PasteView
         content={paste.content}
         renderedContent={<MarkdownRenderer content={paste.content} />}

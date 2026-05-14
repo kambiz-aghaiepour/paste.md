@@ -12,7 +12,8 @@ export function PasteForm() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
-  const [expiration, setExpiration] = useState("never");
+  const [layout, setLayout] = useState<"split" | "preview">("split");
+  const [expiration, setExpiration] = useState("1d");
   const router = useRouter();
 
   const debouncedPreview = useDebounce(content, 300);
@@ -99,18 +100,45 @@ export function PasteForm() {
         </button>
       </div>
 
+      {/* Desktop layout toggle */}
+      <div className="hidden md:flex justify-end">
+        <button
+          type="button"
+          onClick={() => setLayout(layout === "split" ? "preview" : "split")}
+          aria-label={layout === "split" ? "Show preview only" : "Show side by side"}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          {layout === "split" ? (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+              </svg>
+              Preview only
+            </>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="12" y1="3" x2="12" y2="21" />
+              </svg>
+              Side by side
+            </>
+          )}
+        </button>
+      </div>
+
       {/* Split-pane container */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className={`grid grid-cols-1 gap-4 items-stretch ${layout === "split" ? "md:grid-cols-2" : ""}`}>
         {/* Editor pane */}
         <div
-          className={`md:block ${activeTab !== "edit" ? "hidden" : ""}`}
+          className={`${layout === "split" ? "md:flex md:flex-col" : "hidden"} ${activeTab !== "edit" ? "hidden" : ""}`}
         >
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Paste your Markdown here..."
             aria-label="Markdown editor"
-            className="min-h-[calc(100vh-280px)] w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-4 font-mono text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+            className="min-h-[calc(100vh-280px)] md:flex-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-4 font-mono text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none resize-none"
           />
         </div>
 
@@ -137,7 +165,6 @@ export function PasteForm() {
           aria-label="Paste expiration"
           className="w-full sm:w-auto rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
         >
-          <option value="never">Never expires</option>
           <option value="1h">1 hour</option>
           <option value="1d">1 day</option>
           <option value="1w">1 week</option>

@@ -89,9 +89,14 @@ export function PasteView({ content, renderedContent }: PasteViewProps) {
       {activeTab === "rendered" ? (
         <div ref={contentRef}>{renderedContent}</div>
       ) : (
-        <pre className="whitespace-pre-wrap break-words rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 p-4 font-mono text-sm">
-          {content}
-        </pre>
+        <div className="relative group">
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 p-4 font-mono text-sm">
+            {content}
+          </pre>
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-150">
+            <CopyButton textContent={content} />
+          </div>
+        </div>
       )}
     </div>
   );
