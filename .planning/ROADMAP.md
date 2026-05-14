@@ -31,12 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Paste URLs use short random slugs that are not sequential or guessable
   4. Submitting content larger than 512KB is rejected with a clear error message
   5. Pastes persist across server restarts (SQLite storage with expiration column in schema)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md -- Walking Skeleton: scaffold project, data layer, and complete create-view data path
+- [ ] 01-02-PLAN.md -- Automated tests for all requirements and human verification checkpoint
 
 ### Phase 2: Markdown Rendering & Editor
 **Goal**: Users see beautifully rendered Markdown with syntax-highlighted code blocks, and can preview their paste in real-time while editing
@@ -113,7 +112,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Path | 0/3 | Not started | - |
+| 1. Foundation & Data Path | 0/2 | Planning complete | - |
 | 2. Markdown Rendering & Editor | 0/3 | Not started | - |
 | 3. Paste Lifecycle | 0/3 | Not started | - |
 | 4. Security Hardening | 0/1 | Not started | - |
