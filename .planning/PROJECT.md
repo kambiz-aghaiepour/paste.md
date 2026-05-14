@@ -13,13 +13,12 @@ Users can quickly paste Markdown content and get a shareable link that renders i
 ### Validated
 
 - ✓ Create and share pastes via shareable URLs — Phase 1
+- ✓ Markdown rendering for paste content — Phase 2
+- ✓ Real-time Markdown preview while editing — Phase 2
+- ✓ Syntax highlighting for code blocks — Phase 2
 
 ### Active
 
-- [ ] Markdown rendering for paste content
-- [ ] Real-time Markdown preview while editing
-- [ ] Real-time Markdown preview while editing
-- [ ] Syntax highlighting for code blocks
 - [ ] Clean, minimal UI focused on content
 - [ ] Raw text view alongside rendered view
 
