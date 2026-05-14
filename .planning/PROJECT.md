@@ -12,11 +12,12 @@ Users can quickly paste Markdown content and get a shareable link that renders i
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Create and share pastes via shareable URLs — Phase 1
 
 ### Active
 
-- [ ] Create and share Markdown pastes via shareable URLs
+- [ ] Markdown rendering for paste content
+- [ ] Real-time Markdown preview while editing
 - [ ] Real-time Markdown preview while editing
 - [ ] Syntax highlighting for code blocks
 - [ ] Clean, minimal UI focused on content
@@ -65,4 +66,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-14 after initialization*
+*Last updated: 2026-05-14 after Phase 1 completion*
