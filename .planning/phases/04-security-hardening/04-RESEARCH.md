@@ -575,17 +575,15 @@ describe("createRateLimiter", () => {
 | A3 | `app/proxy.ts` is correctly detected by Next.js 16 as the proxy file | Architecture Patterns | HIGH -- if proxy is only detected at root level, existing 410 logic AND new rate limiting would both fail. However, the 410 page currently works, suggesting this location is valid. |
 | A4 | SRI works correctly with Turbopack in Next.js 16.2.6 in both dev and production | Pitfall 6 | HIGH -- if SRI doesn't work in dev, development would break. However, the official 16.2 blog specifically announces Turbopack SRI support. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **proxy.ts file location: `app/proxy.ts` vs root `proxy.ts`**
+1. **proxy.ts file location: `app/proxy.ts` vs root `proxy.ts`** -- RESOLVED
    - What we know: Next.js 16 convention says `proxy.ts` goes at the project root (same level as `app/`). The regex `(?:src/)?proxy` matches root or `src/` but not `app/`. The project currently has `app/proxy.ts` and the 410 logic works.
-   - What's unclear: Whether Next.js has a fallback that discovers `app/proxy.ts`, or whether the 410 behavior works through some other mechanism.
-   - Recommendation: The planner should verify this works by testing. If `app/proxy.ts` stops working, move the file to the project root. Adding rate limiting to a proxy file that isn't actually running as middleware would be a silent failure.
+   - Resolution: `app/proxy.ts` is the active proxy file in this project. The existing 410 expired paste logic runs correctly from this location, confirming Next.js discovers it here. No root-level `proxy.ts` exists. Plans use `app/proxy.ts` as the proxy file location.
 
-2. **SRI in development mode**
+2. **SRI in development mode** -- RESOLVED
    - What we know: SRI generates hashes at build time. In dev mode with Turbopack, scripts are served dynamically with HMR. The official CSP docs show `'unsafe-eval'` for dev but don't explicitly address SRI + dev mode.
-   - What's unclear: Whether SRI integrity attributes are added during dev builds or only production builds. If dev-only, CSP might block scripts in dev unless `'unsafe-inline'` is also added for dev.
-   - Recommendation: Add `'unsafe-inline'` to `script-src` in development mode alongside `'unsafe-eval'` as a safety measure. Production relies on SRI.
+   - Resolution: Add `'unsafe-inline'` to `script-src` in development mode alongside `'unsafe-eval'` as a safety measure. This ensures dev mode works regardless of whether SRI generates integrity attributes for dynamically-served dev scripts. Production relies on SRI for strict script-src without unsafe-inline. This is already reflected in the plan's CSP configuration (Task 2 of Plan 01).
 
 ## Environment Availability
 
@@ -672,8 +670,8 @@ Step 2.6: SKIPPED (no external dependencies identified -- all features use built
 - Standard stack: HIGH - No new dependencies. All functionality uses built-in Next.js features verified via official docs and Context7.
 - Architecture: HIGH - CSP via next.config.ts headers() is the officially documented approach. Rate limiting in proxy is a standard Next.js pattern shown in official backend-for-frontend guide.
 - Pitfalls: HIGH - CSP + inline scripts is a well-documented issue with clear solutions (SRI). Rate limiter memory management is a standard concern with well-known solutions.
-- proxy.ts location: MEDIUM - Existing `app/proxy.ts` works but doesn't match documented convention. Needs validation.
-- SRI in dev mode: MEDIUM - Official docs confirm Turbopack SRI support but don't explicitly document dev-mode behavior.
+- proxy.ts location: HIGH - Existing `app/proxy.ts` works (confirmed by active 410 logic). Open Question 1 resolved.
+- SRI in dev mode: HIGH - Resolved by adding `'unsafe-inline'` to dev script-src as safety measure. Open Question 2 resolved.
 
 **Research date:** 2026-05-14
 **Valid until:** 2026-06-14 (30 days -- stable domain, well-documented APIs)
