@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 **Wave 1**
-- [ ] 01-01-PLAN.md -- Walking Skeleton: scaffold project, data layer, and complete create-view data path
+- [x] 01-01-PLAN.md -- Walking Skeleton: scaffold project, data layer, and complete create-view data path
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md -- Automated tests for all requirements and human verification checkpoint
@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Path | 0/2 | Planning complete | - |
+| 1. Foundation & Data Path | 1/2 | Executing | - |
 | 2. Markdown Rendering & Editor | 0/3 | Not started | - |
 | 3. Paste Lifecycle | 0/3 | Not started | - |
 | 4. Security Hardening | 0/1 | Not started | - |

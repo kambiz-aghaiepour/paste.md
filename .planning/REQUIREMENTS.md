@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Core
 
-- [ ] **CORE-01**: User can create a paste by entering text content and submitting
-- [ ] **CORE-02**: User receives a unique, shareable URL after creating a paste
-- [ ] **CORE-03**: User can view a paste by visiting its URL
-- [ ] **CORE-04**: Paste URLs use short, unguessable, random slugs (nanoid)
+- [x] **CORE-01**: User can create a paste by entering text content and submitting
+- [x] **CORE-02**: User receives a unique, shareable URL after creating a paste
+- [x] **CORE-03**: User can view a paste by visiting its URL
+- [x] **CORE-04**: Paste URLs use short, unguessable, random slugs (nanoid)
 
 ### Rendering
 
@@ -32,11 +32,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **SECU-01**: Rendered Markdown output is sanitized to prevent XSS attacks
 - [ ] **SECU-02**: Application serves strict Content Security Policy headers
 - [ ] **SECU-03**: Paste creation is rate-limited per IP address
-- [ ] **SECU-04**: Paste content size is limited (max 512KB)
+- [x] **SECU-04**: Paste content size is limited (max 512KB)
 
 ### Storage
 
-- [ ] **STOR-01**: Pastes are stored in SQLite with schema including expiration support
+- [x] **STOR-01**: Pastes are stored in SQLite with schema including expiration support
 - [ ] **STOR-02**: User can select paste expiration when creating (1 hour, 1 day, 1 week, 1 month, never)
 - [ ] **STOR-03**: Expired pastes return 410 Gone status
 - [ ] **STOR-04**: Background cleanup removes expired paste data
@@ -90,10 +90,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
-| CORE-04 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Complete |
+| CORE-02 | Phase 1 | Complete |
+| CORE-03 | Phase 1 | Complete |
+| CORE-04 | Phase 1 | Complete |
 | REND-01 | Phase 2 | Pending |
 | REND-02 | Phase 2 | Pending |
 | REND-03 | Phase 2 | Pending |
@@ -104,8 +104,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SECU-01 | Phase 2 | Pending |
 | SECU-02 | Phase 4 | Pending |
 | SECU-03 | Phase 4 | Pending |
-| SECU-04 | Phase 1 | Pending |
-| STOR-01 | Phase 1 | Pending |
+| SECU-04 | Phase 1 | Complete |
+| STOR-01 | Phase 1 | Complete |
 | STOR-02 | Phase 3 | Pending |
 | STOR-03 | Phase 3 | Pending |
 | STOR-04 | Phase 3 | Pending |
