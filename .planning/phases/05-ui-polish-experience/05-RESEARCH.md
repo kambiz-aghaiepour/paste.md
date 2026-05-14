@@ -545,17 +545,13 @@ All components with hardcoded light-mode colors, verified by codebase grep:
 | A2 | `preRef.current?.textContent` correctly extracts code text from Shiki's nested span output | Pattern 4 / Pitfall 4 | If Shiki output structure differs, the copy button might extract wrong text; needs testing |
 | A3 | The `defaultColor: 'light'` option in `@shikijs/rehype` causes Shiki to render inline light theme styles and CSS variables for dark theme | Shiki Dual Theme | If defaultColor behavior differs in rehype plugin vs codeToHtml, code blocks may render incorrectly |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **CSP Hash vs Nonce for FOWT Script**
-   - What we know: The current CSP uses `script-src 'self'` in production (no `'unsafe-inline'`). The FOWT prevention inline script needs to be allowed. SHA-256 hash approach works because the script content is static. Nonce approach requires dynamic rendering (no static optimization).
-   - What's unclear: Whether the project prioritizes static generation (hash) or is already dynamic (nonce). Given that the project uses SQLite and SSR, pages are likely dynamic anyway.
-   - Recommendation: Use SHA-256 hash approach. The script content is deterministic -- compute hash once, add to CSP. This preserves static optimization where possible and avoids middleware complexity. If the hash approach proves problematic, fall back to allowing `'unsafe-inline'` for `script-src` in production with a code comment explaining why.
+1. **CSP Hash vs Nonce for FOWT Script** — RESOLVED: Use SHA-256 hash approach
+   - The script content is deterministic — compute hash once, add to CSP `script-src`. This preserves static optimization and avoids middleware complexity. Fallback: allow `'unsafe-inline'` for `script-src` in production if hash proves problematic.
 
-2. **Copy Button on Server-Rendered Paste View**
-   - What we know: `MarkdownRenderer` is a Server Component. The `pre` override via `components` prop requires a Client Component. `PasteView` is already a Client Component that wraps the rendered content.
-   - What's unclear: Whether the `components` prop works on `MarkdownAsync` (Server Component) with Client Component overrides, or whether the copy button must be added post-render in `PasteView`.
-   - Recommendation: Two approaches: (1) Add `components={{ pre: CopyablePre }}` to `MarkdownAsync` -- if it works, this is cleanest. (2) If RSC boundaries prevent it, use a client-side DOM approach in `PasteView` that queries all `pre` elements and injects copy buttons after hydration. Approach (1) should be tried first.
+2. **Copy Button on Server-Rendered Paste View** — RESOLVED: Use client-side DOM approach in PasteView
+   - `MarkdownRenderer` is a Server Component; passing Client Component overrides via `components` prop crosses RSC boundaries. The planner chose approach (2): client-side DOM approach in `PasteView` that queries `pre` elements and injects copy buttons after hydration. This keeps the RSC rendering path clean.
 
 ## Validation Architecture
 
