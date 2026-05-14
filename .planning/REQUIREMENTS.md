@@ -1,0 +1,124 @@
+# Requirements: paste.md
+
+**Defined:** 2026-05-14
+**Core Value:** Users can quickly paste Markdown content and get a shareable link that renders it beautifully — zero friction from paste to share.
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Core
+
+- [ ] **CORE-01**: User can create a paste by entering text content and submitting
+- [ ] **CORE-02**: User receives a unique, shareable URL after creating a paste
+- [ ] **CORE-03**: User can view a paste by visiting its URL
+- [ ] **CORE-04**: Paste URLs use short, unguessable, random slugs (nanoid)
+
+### Rendering
+
+- [ ] **REND-01**: Paste content is rendered as GitHub Flavored Markdown (tables, task lists, strikethrough, autolinks)
+- [ ] **REND-02**: Code blocks in pastes display with syntax highlighting for 100+ languages
+- [ ] **REND-03**: User sees a real-time Markdown preview while typing in the editor
+- [ ] **REND-04**: User can toggle between rendered view and raw Markdown source on a paste page
+
+### Editor
+
+- [ ] **EDIT-01**: Editor provides a clean textarea for entering Markdown content
+- [ ] **EDIT-02**: Editor persists content to localStorage to prevent accidental loss
+- [ ] **EDIT-03**: Editor supports split-pane layout (edit left, preview right) on desktop
+
+### Security
+
+- [ ] **SECU-01**: Rendered Markdown output is sanitized to prevent XSS attacks
+- [ ] **SECU-02**: Application serves strict Content Security Policy headers
+- [ ] **SECU-03**: Paste creation is rate-limited per IP address
+- [ ] **SECU-04**: Paste content size is limited (max 512KB)
+
+### Storage
+
+- [ ] **STOR-01**: Pastes are stored in SQLite with schema including expiration support
+- [ ] **STOR-02**: User can select paste expiration when creating (1 hour, 1 day, 1 week, 1 month, never)
+- [ ] **STOR-03**: Expired pastes return 410 Gone status
+- [ ] **STOR-04**: Background cleanup removes expired paste data
+
+### UI
+
+- [ ] **UI-01**: Interface is clean, minimal, and ad-free
+- [ ] **UI-02**: Paste reading experience is fully responsive on mobile devices
+- [ ] **UI-03**: Code blocks display a copy-to-clipboard button
+- [ ] **UI-04**: Application supports dark mode (system preference + manual toggle)
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Power Features
+
+- **POWR-01**: User can create pastes via CLI/API (`POST /api/paste`)
+- **POWR-02**: Mermaid diagram code blocks render as SVG diagrams
+- **POWR-03**: KaTeX math expressions render inline and block equations
+- **POWR-04**: Long pastes auto-generate a table of contents from headings
+- **POWR-05**: User can specify a custom URL slug for their paste
+- **POWR-06**: User can fork an existing paste into a new editable paste
+- **POWR-07**: Keyboard shortcuts for common actions (Ctrl+Enter to publish, Ctrl+Shift+P to toggle preview)
+
+### Operational
+
+- **OPER-01**: Embed snippet / oEmbed support for embedding pastes in external sites
+- **OPER-02**: QR code generation for paste URLs
+- **OPER-03**: Download paste as raw .md file
+- **OPER-04**: Abuse reporting mechanism
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| User accounts / authentication | Contradicts anonymous-first positioning; adds friction |
+| Paste editing after creation | Immutable pastes simplify caching and guarantee link stability |
+| Real-time collaboration | Massive complexity (CRDT/OT); HackMD/Notion own this space |
+| End-to-end encryption | Breaks server-side rendering, the core value proposition |
+| File/image upload | Abuse magnet, storage costs, content moderation burden |
+| Social features (comments, likes) | Not a social network; moderation burden with no proportional value |
+| Code execution | Fundamentally different product with major security implications |
+| Paste discovery / trending | Security nightmare; invites abuse (leaked credentials, spam) |
+| Ads / premium tiers / paywalls | #1 complaint about Pastebin.com; contradicts clean UI positioning |
+| Password-protected pastes | Adds friction; unguessable URLs provide adequate privacy |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CORE-01 | — | Pending |
+| CORE-02 | — | Pending |
+| CORE-03 | — | Pending |
+| CORE-04 | — | Pending |
+| REND-01 | — | Pending |
+| REND-02 | — | Pending |
+| REND-03 | — | Pending |
+| REND-04 | — | Pending |
+| EDIT-01 | — | Pending |
+| EDIT-02 | — | Pending |
+| EDIT-03 | — | Pending |
+| SECU-01 | — | Pending |
+| SECU-02 | — | Pending |
+| SECU-03 | — | Pending |
+| SECU-04 | — | Pending |
+| STOR-01 | — | Pending |
+| STOR-02 | — | Pending |
+| STOR-03 | — | Pending |
+| STOR-04 | — | Pending |
+| UI-01 | — | Pending |
+| UI-02 | — | Pending |
+| UI-03 | — | Pending |
+| UI-04 | — | Pending |
+
+**Coverage:**
+- v1 requirements: 23 total
+- Mapped to phases: 0
+- Unmapped: 23 ⚠️
+
+---
+*Requirements defined: 2026-05-14*
+*Last updated: 2026-05-14 after initial definition*
