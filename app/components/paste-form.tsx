@@ -72,15 +72,15 @@ export function PasteForm() {
       <DraftIndicator visible={wasRestored} onDismiss={dismissRestored} />
 
       {/* Mobile toggle */}
-      <div className="flex rounded-lg border border-gray-200 overflow-hidden md:hidden">
+      <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden md:hidden">
         <button
           type="button"
           onClick={() => setActiveTab("edit")}
           aria-pressed={activeTab === "edit"}
-          className={`flex-1 py-2 text-sm font-medium text-center ${
+          className={`flex-1 py-2 text-sm font-medium text-center min-h-[44px] transition-colors ${
             activeTab === "edit"
               ? "bg-blue-600 text-white"
-              : "bg-white text-gray-600"
+              : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300"
           }`}
         >
           Edit
@@ -89,10 +89,10 @@ export function PasteForm() {
           type="button"
           onClick={() => setActiveTab("preview")}
           aria-pressed={activeTab === "preview"}
-          className={`flex-1 py-2 text-sm font-medium text-center ${
+          className={`flex-1 py-2 text-sm font-medium text-center min-h-[44px] transition-colors ${
             activeTab === "preview"
               ? "bg-blue-600 text-white"
-              : "bg-white text-gray-600"
+              : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300"
           }`}
         >
           Preview
@@ -110,23 +110,23 @@ export function PasteForm() {
             onChange={(e) => setContent(e.target.value)}
             placeholder="Paste your Markdown here..."
             aria-label="Markdown editor"
-            className="min-h-[calc(100vh-280px)] w-full rounded-lg border border-gray-300 p-4 font-mono text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+            className="min-h-[calc(100vh-280px)] w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-4 font-mono text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Preview pane */}
         <div
-          className={`md:block rounded-lg border border-gray-200 p-4 overflow-y-auto min-h-[calc(100vh-280px)] ${
+          className={`md:block rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 p-4 overflow-y-auto min-h-[calc(100vh-280px)] ${
             activeTab !== "preview" ? "hidden" : ""
           }`}
         >
-          <div className="text-sm font-medium text-gray-500 mb-2">Preview</div>
+          <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Preview</div>
           <MarkdownPreview content={debouncedPreview} />
         </div>
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}
@@ -135,7 +135,7 @@ export function PasteForm() {
           value={expiration}
           onChange={(e) => setExpiration(e.target.value)}
           aria-label="Paste expiration"
-          className="w-full sm:w-auto rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+          className="w-full sm:w-auto rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
         >
           <option value="never">Never expires</option>
           <option value="1h">1 hour</option>
@@ -146,7 +146,7 @@ export function PasteForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="ml-auto rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="ml-auto rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {submitting ? "Creating..." : "Create Paste"}
         </button>
