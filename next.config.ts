@@ -1,10 +1,17 @@
 import type { NextConfig } from "next";
+import crypto from "node:crypto";
+import { THEME_SCRIPT } from "./lib/theme-script-content";
 
 const isDev = process.env.NODE_ENV === "development";
 
+const themeScriptHash = crypto
+  .createHash("sha256")
+  .update(THEME_SCRIPT)
+  .digest("base64");
+
 const cspDirectives = [
   "default-src 'self'",
-  `script-src 'self'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ""}`,
+  `script-src 'self'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ` 'sha256-${themeScriptHash}'`}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self'",
   "font-src 'self'",
