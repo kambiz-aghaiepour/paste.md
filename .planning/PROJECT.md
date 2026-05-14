@@ -18,6 +18,8 @@ Users can quickly paste Markdown content and get a shareable link that renders i
 - ✓ Syntax highlighting for code blocks — Phase 2
 - ✓ Raw text view alongside rendered view — Phase 3
 - ✓ Paste expiration controls — Phase 3
+- ✓ Content Security Policy headers — Phase 4
+- ✓ Rate limiting on paste creation — Phase 4
 
 ### Active
 
@@ -66,4 +68,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-14 after Phase 1 completion*
+*Last updated: 2026-05-14 after Phase 4 completion*
