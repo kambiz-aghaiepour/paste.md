@@ -99,7 +99,7 @@ Plans:
 - [x] 04-01-PLAN.md -- CSP headers with SRI, supplementary security headers, and rate limiter module with TDD
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-02-PLAN.md -- Wire rate limiter into proxy, integration tests, and human verification
+- [x] 04-02-PLAN.md -- Wire rate limiter into proxy, integration tests, and human verification
 
 ### Phase 5: UI Polish & Experience
 **Goal**: The interface is clean, responsive, and delightful to use across devices and lighting conditions
