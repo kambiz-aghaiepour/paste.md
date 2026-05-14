@@ -92,10 +92,14 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. All responses include strict Content Security Policy headers that block inline scripts and unauthorized resource loading
   2. Paste creation is rate-limited per IP address, and exceeding the limit returns a 429 response with a clear message
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
+**Wave 1**
+- [ ] 04-01-PLAN.md -- CSP headers with SRI, supplementary security headers, and rate limiter module with TDD
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 04-02-PLAN.md -- Wire rate limiter into proxy, integration tests, and human verification
 
 ### Phase 5: UI Polish & Experience
 **Goal**: The interface is clean, responsive, and delightful to use across devices and lighting conditions
@@ -125,5 +129,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Foundation & Data Path | 1/2 | Executing | - |
 | 2. Markdown Rendering & Editor | 1/3 | In Progress|  |
 | 3. Paste Lifecycle | 1/2 | In Progress|  |
-| 4. Security Hardening | 0/1 | Not started | - |
+| 4. Security Hardening | 0/2 | Not started | - |
 | 5. UI Polish & Experience | 0/3 | Not started | - |
