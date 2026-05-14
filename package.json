@@ -32,7 +32,11 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "drizzle-kit": "^0.31.10",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "typescript": "^5.0.0",
+    "unified": "^11.0.5",
     "vitest": "^3.0.0"
   }
 }
