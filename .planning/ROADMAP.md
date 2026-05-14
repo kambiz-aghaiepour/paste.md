@@ -111,13 +111,15 @@ Plans:
   2. Paste reading experience works well on mobile devices (text reflows, code blocks scroll horizontally, no layout breakage)
   3. Code blocks display a copy-to-clipboard button that copies the code content on click
   4. Application supports dark mode via system preference detection and a manual toggle
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+**Wave 1**
+- [ ] 05-01-PLAN.md -- Dark mode infrastructure, theme toggle, Shiki dual themes, and visual cleanup across all components
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 05-02-PLAN.md -- Copy-to-clipboard on code blocks, mobile responsiveness, automated tests, and human verification
 
 ## Progress
 
@@ -126,8 +128,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Path | 1/2 | Executing | - |
-| 2. Markdown Rendering & Editor | 1/3 | In Progress|  |
-| 3. Paste Lifecycle | 1/2 | In Progress|  |
-| 4. Security Hardening | 0/2 | Not started | - |
-| 5. UI Polish & Experience | 0/3 | Not started | - |
+| 1. Foundation & Data Path | 2/2 | Complete | - |
+| 2. Markdown Rendering & Editor | 3/3 | Complete |  |
+| 3. Paste Lifecycle | 2/2 | Complete |  |
+| 4. Security Hardening | 2/2 | Complete | - |
+| 5. UI Polish & Experience | 0/2 | Not started | - |
