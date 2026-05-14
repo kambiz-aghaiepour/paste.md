@@ -43,10 +43,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI
 
-- [ ] **UI-01**: Interface is clean, minimal, and ad-free
-- [ ] **UI-02**: Paste reading experience is fully responsive on mobile devices
-- [ ] **UI-03**: Code blocks display a copy-to-clipboard button
-- [ ] **UI-04**: Application supports dark mode (system preference + manual toggle)
+- [x] **UI-01**: Interface is clean, minimal, and ad-free
+- [x] **UI-02**: Paste reading experience is fully responsive on mobile devices
+- [x] **UI-03**: Code blocks display a copy-to-clipboard button
+- [x] **UI-04**: Application supports dark mode (system preference + manual toggle)
 
 ## v2 Requirements
 
@@ -109,10 +109,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-02 | Phase 3 | Complete |
 | STOR-03 | Phase 3 | Complete |
 | STOR-04 | Phase 3 | Complete |
-| UI-01 | Phase 5 | Pending |
-| UI-02 | Phase 5 | Pending |
-| UI-03 | Phase 5 | Pending |
-| UI-04 | Phase 5 | Pending |
+| UI-01 | Phase 5 | Complete |
+| UI-02 | Phase 5 | Complete |
+| UI-03 | Phase 5 | Complete |
+| UI-04 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 23 total

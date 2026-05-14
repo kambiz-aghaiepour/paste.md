@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Markdown Rendering & Editor** - Render GFM with syntax highlighting and provide a live-preview editor
 - [ ] **Phase 3: Paste Lifecycle** - Expiration controls, expired paste handling, background cleanup, and raw view toggle
 - [ ] **Phase 4: Security Hardening** - CSP headers and rate limiting for public deployment
-- [ ] **Phase 5: UI Polish & Experience** - Clean responsive interface with dark mode and quality-of-life features
+- [x] **Phase 5: UI Polish & Experience** - Clean responsive interface with dark mode and quality-of-life features (completed 2026-05-14)
 
 ## Phase Details
 
@@ -132,4 +132,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Markdown Rendering & Editor | 3/3 | Complete |  |
 | 3. Paste Lifecycle | 2/2 | Complete |  |
 | 4. Security Hardening | 2/2 | Complete | - |
-| 5. UI Polish & Experience | 0/2 | Not started | - |
+| 5. UI Polish & Experience | 2/2 | Complete    | 2026-05-14 |
