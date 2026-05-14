@@ -51,13 +51,18 @@ Plans:
   3. User sees a live preview of rendered Markdown updating as they type in the editor
   4. Editor content survives accidental page refresh or browser close (localStorage persistence)
   5. On desktop, user can work in a split-pane layout with editor on the left and preview on the right
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+**Wave 1**
+- [ ] 02-01-PLAN.md -- Install rendering dependencies, create MarkdownRenderer server component, wire into paste view
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-02-PLAN.md -- Create custom hooks and preview components, extend editor with split-pane, live preview, mobile toggle, localStorage
+
+**Wave 3** *(blocked on Wave 1 + Wave 2 completion)*
+- [ ] 02-03-PLAN.md -- Automated tests for rendering pipeline and localStorage, human verification checkpoint
 
 ### Phase 3: Paste Lifecycle
 **Goal**: Users can control how long their pastes live and view paste content in both rendered and raw formats
