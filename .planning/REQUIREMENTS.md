@@ -39,7 +39,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **STOR-01**: Pastes are stored in SQLite with schema including expiration support
 - [x] **STOR-02**: User can select paste expiration when creating (1 hour, 1 day, 1 week, 1 month, never)
 - [x] **STOR-03**: Expired pastes return 410 Gone status
-- [ ] **STOR-04**: Background cleanup removes expired paste data
+- [x] **STOR-04**: Background cleanup removes expired paste data
 
 ### UI
 
@@ -108,7 +108,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-01 | Phase 1 | Complete |
 | STOR-02 | Phase 3 | Complete |
 | STOR-03 | Phase 3 | Complete |
-| STOR-04 | Phase 3 | Pending |
+| STOR-04 | Phase 3 | Complete |
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |
 | UI-03 | Phase 5 | Pending |

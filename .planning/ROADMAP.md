@@ -82,7 +82,7 @@ Plans:
 - [x] 03-01-PLAN.md -- Expiration creation, 410 expired handling, and rendered/raw view toggle
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 03-02-PLAN.md -- Background cleanup endpoint, automated tests, and human verification
+- [x] 03-02-PLAN.md -- Background cleanup endpoint, automated tests, and human verification
 
 ### Phase 4: Security Hardening
 **Goal**: The service is hardened against common web attacks and abuse before public deployment
