@@ -57,7 +57,15 @@ export function proxy(request: NextRequest) {
       `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Expired - paste.md</title></head>
-<body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased">
+<body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;background:#fff;color:#1f2937">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      body { background: #111827 !important; color: #f3f4f6 !important; }
+      h1 { color: #6b7280 !important; }
+      p { color: #9ca3af !important; }
+      a { color: #60a5fa !important; }
+    }
+  </style>
   <h1 style="margin-bottom:1rem;font-size:2.25rem;font-weight:700;color:#9ca3af">410</h1>
   <p style="margin-bottom:2rem;color:#6b7280">This paste has expired.</p>
   <a href="/" style="color:#2563eb;text-decoration:none">Back to home</a>

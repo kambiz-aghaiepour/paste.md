@@ -9,12 +9,15 @@ interface MarkdownRendererProps {
 
 export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <article className="prose prose-gray max-w-none prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:p-0 prose-img:rounded-lg">
+    <article className="prose prose-gray dark:prose-invert max-w-none prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:p-0 prose-img:rounded-lg">
       <MarkdownAsync
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
           rehypeSanitize,
-          [rehypeShiki, { theme: "github-light" }],
+          [rehypeShiki, {
+            themes: { light: "github-light", dark: "github-dark" },
+            defaultColor: "light",
+          }],
         ]}
       >
         {content}

@@ -11,7 +11,7 @@ interface MarkdownPreviewProps {
 export function MarkdownPreview({ content }: MarkdownPreviewProps) {
   return (
     <div
-      className="prose prose-gray max-w-none prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:p-0 prose-img:rounded-lg"
+      className="prose prose-gray dark:prose-invert max-w-none prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:p-0 prose-img:rounded-lg"
       role="region"
       aria-label="Markdown preview"
       aria-live="polite"

@@ -29,7 +29,7 @@ export function DraftIndicator({ visible, onDismiss }: DraftIndicatorProps) {
   return (
     <div
       role="status"
-      className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700"
+      className="flex items-center justify-between rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 px-4 py-2 text-sm text-blue-700 dark:text-blue-300"
     >
       <span>Draft restored</span>
       <button
@@ -37,7 +37,7 @@ export function DraftIndicator({ visible, onDismiss }: DraftIndicatorProps) {
           setShow(false);
           onDismiss();
         }}
-        className="text-blue-400 hover:text-blue-600"
+        className="text-blue-400 dark:text-blue-500 hover:text-blue-600 dark:hover:text-blue-300"
         aria-label="Dismiss draft notification"
       >
         x
