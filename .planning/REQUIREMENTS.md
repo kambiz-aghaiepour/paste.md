@@ -19,7 +19,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **REND-01**: Paste content is rendered as GitHub Flavored Markdown (tables, task lists, strikethrough, autolinks)
 - [x] **REND-02**: Code blocks in pastes display with syntax highlighting for 100+ languages
 - [x] **REND-03**: User sees a real-time Markdown preview while typing in the editor
-- [ ] **REND-04**: User can toggle between rendered view and raw Markdown source on a paste page
+- [x] **REND-04**: User can toggle between rendered view and raw Markdown source on a paste page
 
 ### Editor
 
@@ -37,8 +37,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Storage
 
 - [x] **STOR-01**: Pastes are stored in SQLite with schema including expiration support
-- [ ] **STOR-02**: User can select paste expiration when creating (1 hour, 1 day, 1 week, 1 month, never)
-- [ ] **STOR-03**: Expired pastes return 410 Gone status
+- [x] **STOR-02**: User can select paste expiration when creating (1 hour, 1 day, 1 week, 1 month, never)
+- [x] **STOR-03**: Expired pastes return 410 Gone status
 - [ ] **STOR-04**: Background cleanup removes expired paste data
 
 ### UI
@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REND-01 | Phase 2 | Complete |
 | REND-02 | Phase 2 | Complete |
 | REND-03 | Phase 2 | Complete |
-| REND-04 | Phase 3 | Pending |
+| REND-04 | Phase 3 | Complete |
 | EDIT-01 | Phase 2 | Complete |
 | EDIT-02 | Phase 2 | Complete |
 | EDIT-03 | Phase 2 | Complete |
@@ -106,8 +106,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SECU-03 | Phase 4 | Pending |
 | SECU-04 | Phase 1 | Complete |
 | STOR-01 | Phase 1 | Complete |
-| STOR-02 | Phase 3 | Pending |
-| STOR-03 | Phase 3 | Pending |
+| STOR-02 | Phase 3 | Complete |
+| STOR-03 | Phase 3 | Complete |
 | STOR-04 | Phase 3 | Pending |
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |

@@ -79,7 +79,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 03-01-PLAN.md -- Expiration creation, 410 expired handling, and rendered/raw view toggle
+- [x] 03-01-PLAN.md -- Expiration creation, 410 expired handling, and rendered/raw view toggle
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 03-02-PLAN.md -- Background cleanup endpoint, automated tests, and human verification
@@ -124,6 +124,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Path | 1/2 | Executing | - |
 | 2. Markdown Rendering & Editor | 1/3 | In Progress|  |
-| 3. Paste Lifecycle | 0/3 | Not started | - |
+| 3. Paste Lifecycle | 1/2 | In Progress|  |
 | 4. Security Hardening | 0/1 | Not started | - |
 | 5. UI Polish & Experience | 0/3 | Not started | - |
