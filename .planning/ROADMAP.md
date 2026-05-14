@@ -116,7 +116,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 05-01-PLAN.md -- Dark mode infrastructure, theme toggle, Shiki dual themes, and visual cleanup across all components
+- [x] 05-01-PLAN.md -- Dark mode infrastructure, theme toggle, Shiki dual themes, and visual cleanup across all components
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 05-02-PLAN.md -- Copy-to-clipboard on code blocks, mobile responsiveness, automated tests, and human verification
