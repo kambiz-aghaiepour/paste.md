@@ -74,13 +74,15 @@ Plans:
   2. Visiting an expired paste URL returns a 410 Gone status with a clear message
   3. User can toggle between rendered Markdown view and raw source view on a paste page
   4. Expired paste data is automatically cleaned up and does not accumulate in the database
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+**Wave 1**
+- [ ] 03-01-PLAN.md -- Expiration creation, 410 expired handling, and rendered/raw view toggle
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 03-02-PLAN.md -- Background cleanup endpoint, automated tests, and human verification
 
 ### Phase 4: Security Hardening
 **Goal**: The service is hardened against common web attacks and abuse before public deployment
