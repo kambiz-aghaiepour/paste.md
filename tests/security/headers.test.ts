@@ -120,6 +120,21 @@ describe("SECU-02: CSP and security headers configuration", () => {
     expect(cspHeader!.value).toContain("script-src 'self'");
   });
 
+  it("UI-04: CSP script-src includes FOWT prevention script hash", async () => {
+    const headerEntries = await nextConfig.headers!();
+    const globalEntry = headerEntries.find(
+      (entry) => entry.source === "/(.*)",
+    );
+
+    const cspHeader = globalEntry!.headers.find(
+      (h) => h.key === "Content-Security-Policy",
+    );
+    expect(cspHeader).toBeDefined();
+    // In production mode (NODE_ENV !== "development"), script-src should
+    // contain a sha256- hash for the FOWT prevention inline script
+    expect(cspHeader!.value).toContain("sha256-");
+  });
+
   it("SECU-02: next.config.ts headers() returns X-Content-Type-Options", async () => {
     const headerEntries = await nextConfig.headers!();
     const globalEntry = headerEntries.find(
