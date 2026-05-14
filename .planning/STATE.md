@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-05-14T10:28:19.747Z"
+last_updated: "2026-05-14T10:32:10.676Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 02 (Markdown Rendering & Editor) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-14
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [██████░░░░] 60%
 *Updated after each plan completion*
 | Phase 01 P02 | 2min | 2 tasks | 3 files |
 | Phase 02 P01 | 2min | 2 tasks | 4 files |
+| Phase 02 P02 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Direct handler testing pattern: import and call route handlers with constructed Request objects
 - [Phase ?]: [02-01]: rehypeSanitize before rehypeShiki in plugin array -- sanitize untrusted input first, then apply trusted Shiki styling
 - [Phase ?]: [02-01]: MarkdownAsync (async variant) for Server Component rendering with Shiki async plugin
+- [02-02]: Value-based debounce pattern (300ms preview, 1000ms save) to avoid stale closures
+- [02-02]: Same prose overrides on MarkdownPreview as MarkdownRenderer for D-17 consistency
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T10:28:12.820Z
-Stopped at: Phase 2 UI-SPEC approved
+Last session: 2026-05-14T10:32:10.668Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

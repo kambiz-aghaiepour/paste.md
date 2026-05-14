@@ -18,14 +18,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **REND-01**: Paste content is rendered as GitHub Flavored Markdown (tables, task lists, strikethrough, autolinks)
 - [x] **REND-02**: Code blocks in pastes display with syntax highlighting for 100+ languages
-- [ ] **REND-03**: User sees a real-time Markdown preview while typing in the editor
+- [x] **REND-03**: User sees a real-time Markdown preview while typing in the editor
 - [ ] **REND-04**: User can toggle between rendered view and raw Markdown source on a paste page
 
 ### Editor
 
-- [ ] **EDIT-01**: Editor provides a clean textarea for entering Markdown content
-- [ ] **EDIT-02**: Editor persists content to localStorage to prevent accidental loss
-- [ ] **EDIT-03**: Editor supports split-pane layout (edit left, preview right) on desktop
+- [x] **EDIT-01**: Editor provides a clean textarea for entering Markdown content
+- [x] **EDIT-02**: Editor persists content to localStorage to prevent accidental loss
+- [x] **EDIT-03**: Editor supports split-pane layout (edit left, preview right) on desktop
 
 ### Security
 
@@ -96,11 +96,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CORE-04 | Phase 1 | Complete |
 | REND-01 | Phase 2 | Complete |
 | REND-02 | Phase 2 | Complete |
-| REND-03 | Phase 2 | Pending |
+| REND-03 | Phase 2 | Complete |
 | REND-04 | Phase 3 | Pending |
-| EDIT-01 | Phase 2 | Pending |
-| EDIT-02 | Phase 2 | Pending |
-| EDIT-03 | Phase 2 | Pending |
+| EDIT-01 | Phase 2 | Complete |
+| EDIT-02 | Phase 2 | Complete |
+| EDIT-03 | Phase 2 | Complete |
 | SECU-01 | Phase 2 | Complete |
 | SECU-02 | Phase 4 | Pending |
 | SECU-03 | Phase 4 | Pending |
