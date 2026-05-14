@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { db } from "@/lib/db";
-import { createPaste, getPasteById } from "@/lib/db/queries";
+import { createPaste, getPasteById, deleteExpiredPastes } from "@/lib/db/queries";
 import { pastes } from "@/lib/db/schema";
 import { like } from "drizzle-orm";
 
@@ -82,5 +82,36 @@ describe("query functions", () => {
   it("getPasteById returns undefined for non-existent id", () => {
     const result = getPasteById("nonexistent");
     expect(result).toBeUndefined();
+  });
+
+  it("STOR-04: deleteExpiredPastes removes expired rows and returns count", () => {
+    // Create an expired paste (expiresAt in the past)
+    createPaste({
+      id: "test-del1",
+      content: "expired",
+      createdAt: 500,
+      expiresAt: 1000,
+      sizeBytes: 7,
+    });
+
+    // Create a non-expired paste (expiresAt is null)
+    createPaste({
+      id: "test-del2",
+      content: "not expired",
+      createdAt: 500,
+      expiresAt: null,
+      sizeBytes: 11,
+    });
+
+    const deletedCount = deleteExpiredPastes();
+    expect(deletedCount).toBe(1);
+
+    // Verify expired paste is gone
+    expect(getPasteById("test-del1")).toBeUndefined();
+
+    // Verify non-expired paste remains
+    const remaining = getPasteById("test-del2");
+    expect(remaining).toBeDefined();
+    expect(remaining!.content).toBe("not expired");
   });
 });
