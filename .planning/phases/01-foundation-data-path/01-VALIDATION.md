@@ -2,8 +2,8 @@
 phase: 1
 slug: foundation-data-path
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-14
 ---
 
@@ -18,7 +18,7 @@ created: 2026-05-14
 | Property | Value |
 |----------|-------|
 | **Framework** | vitest |
-| **Config file** | vitest.config.ts (Wave 0 installs) |
+| **Config file** | vitest.config.ts (Plan 01-01, Task 1 installs and configures) |
 | **Quick run command** | `npx vitest run --reporter=verbose` |
 | **Full suite command** | `npx vitest run --reporter=verbose` |
 | **Estimated runtime** | ~5 seconds |
@@ -51,11 +51,11 @@ created: 2026-05-14
 
 ## Wave 0 Requirements
 
-- [ ] `vitest` + `@vitest/coverage-v8` — install test framework
-- [ ] `vitest.config.ts` — configuration
-- [ ] Test stubs for API routes and database operations
+- [x] `vitest` — installed by Plan 01-01, Task 1 (dev dependency)
+- [x] `vitest.config.ts` — created by Plan 01-01, Task 1 (step 11)
+- [ ] Test stubs for API routes and database operations — created by Plan 01-02, Task 1
 
-*If none: "Existing infrastructure covers all phase requirements."*
+*Wave 0 infrastructure (vitest install + config) is covered by Plan 01-01, Task 1. Test files themselves are created in Plan 01-02, Task 1.*
 
 ---
 
@@ -69,11 +69,11 @@ created: 2026-05-14
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
