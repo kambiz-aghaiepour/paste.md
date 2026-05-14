@@ -23,7 +23,7 @@ Users can quickly paste Markdown content and get a shareable link that renders i
 
 ### Active
 
-- [ ] Clean, minimal UI focused on content
+- ✓ Clean, minimal UI focused on content — Phase 5
 
 ### Out of Scope
 
@@ -68,4 +68,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-14 after Phase 4 completion*
+*Last updated: 2026-05-14 after Phase 5 completion — all v1 phases complete*
