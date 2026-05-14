@@ -1,12 +1,54 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getPasteById } from "@/lib/db/queries";
+import { createRateLimiter } from "@/lib/rate-limiter";
 
 export const config = {
-  matcher: "/:slug([A-Za-z0-9_-]{8})",
+  matcher: [
+    "/:slug([A-Za-z0-9_-]{8})",
+    "/api/paste",
+  ],
 };
 
+const rateLimiter = createRateLimiter(5, 60_000);
+
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  return "unknown";
+}
+
 export function proxy(request: NextRequest) {
+  // Rate limiting: only POST /api/paste
+  if (
+    request.nextUrl.pathname === "/api/paste" &&
+    request.method === "POST"
+  ) {
+    const ip = getClientIp(request);
+    const result = rateLimiter.check(ip);
+
+    if (result.limited) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(result.retryAfterSeconds),
+          },
+        },
+      );
+    }
+    return NextResponse.next();
+  }
+
+  // GET /api/paste passes through without rate limiting
+  if (request.nextUrl.pathname === "/api/paste") {
+    return NextResponse.next();
+  }
+
+  // Existing 410 logic for expired pastes
   const slug = request.nextUrl.pathname.slice(1);
   const paste = getPasteById(slug);
 
