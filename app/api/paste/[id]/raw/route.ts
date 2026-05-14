@@ -11,6 +11,10 @@ export async function GET(
     return new Response("Paste not found", { status: 404 });
   }
 
+  if (paste.expiresAt && Date.now() / 1000 > paste.expiresAt) {
+    return new Response("This paste has expired", { status: 410 });
+  }
+
   return new Response(paste.content, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",

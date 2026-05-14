@@ -12,6 +12,7 @@ export function PasteForm() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
+  const [expiration, setExpiration] = useState("never");
   const router = useRouter();
 
   const debouncedPreview = useDebounce(content, 300);
@@ -47,7 +48,7 @@ export function PasteForm() {
       const res = await fetch("/api/paste", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, expiration }),
       });
 
       if (!res.ok) {
@@ -129,13 +130,27 @@ export function PasteForm() {
           {error}
         </p>
       )}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
-        {submitting ? "Creating..." : "Create Paste"}
-      </button>
+      <div className="flex items-center gap-4 flex-wrap">
+        <select
+          value={expiration}
+          onChange={(e) => setExpiration(e.target.value)}
+          aria-label="Paste expiration"
+          className="w-full sm:w-auto rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+        >
+          <option value="never">Never expires</option>
+          <option value="1h">1 hour</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1m">1 month</option>
+        </select>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="ml-auto rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {submitting ? "Creating..." : "Create Paste"}
+        </button>
+      </div>
     </form>
   );
 }

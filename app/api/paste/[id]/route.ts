@@ -12,6 +12,13 @@ export async function GET(
     return NextResponse.json({ error: "Paste not found" }, { status: 404 });
   }
 
+  if (paste.expiresAt && Date.now() / 1000 > paste.expiresAt) {
+    return NextResponse.json(
+      { error: "This paste has expired" },
+      { status: 410 },
+    );
+  }
+
   return NextResponse.json({
     id: paste.id,
     content: paste.content,

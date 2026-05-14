@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createPaste } from "@/lib/db/queries";
+import { computeExpiresAt, VALID_EXPIRATIONS } from "@/lib/expiration";
 
 const MAX_CONTENT_BYTES = 512 * 1024; // 512KB
 
@@ -12,7 +13,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { content } = body as { content?: string };
+  const { content, expiration } = body as {
+    content?: string;
+    expiration?: string;
+  };
 
   if (!content || typeof content !== "string" || content.trim().length === 0) {
     return NextResponse.json(
@@ -29,15 +33,24 @@ export async function POST(request: Request) {
     );
   }
 
+  const expirationValue = expiration ?? "never";
+  if (!VALID_EXPIRATIONS.includes(expirationValue)) {
+    return NextResponse.json(
+      { error: "Invalid expiration value" },
+      { status: 400 },
+    );
+  }
+
   const id = nanoid(8);
   const now = Math.floor(Date.now() / 1000);
+  const expiresAt = computeExpiresAt(now, expirationValue);
 
   try {
     createPaste({
       id,
       content,
       createdAt: now,
-      expiresAt: null,
+      expiresAt,
       sizeBytes,
     });
   } catch (err: unknown) {
@@ -48,7 +61,7 @@ export async function POST(request: Request) {
         id: retryId,
         content,
         createdAt: now,
-        expiresAt: null,
+        expiresAt,
         sizeBytes,
       });
       return NextResponse.json(
