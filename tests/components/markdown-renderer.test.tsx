@@ -21,7 +21,7 @@ async function processMarkdown(input: string): Promise<string> {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize)
-    .use(rehypeShiki, { theme: "github-light" })
+    .use(rehypeShiki, { themes: { light: "github-light", dark: "github-dark" }, defaultColor: "light" })
     .use(rehypeStringify)
     .process(input);
   return String(result);
@@ -95,6 +95,17 @@ const x = 1;
 
     // Must not contain dangerous javascript: protocol
     expect(output).not.toContain("javascript:");
+  });
+
+  it("UI-04: renders dual-theme CSS variables for code blocks", async () => {
+    const input = `\`\`\`javascript
+const greeting = "Hello";
+\`\`\``;
+
+    const output = await processMarkdown(input);
+
+    // Shiki dual-theme mode generates --shiki-dark CSS variables
+    expect(output).toContain("--shiki-dark");
   });
 
   it("SECU-01: preserves Shiki styles after sanitization", async () => {
