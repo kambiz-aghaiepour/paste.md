@@ -528,17 +528,15 @@ Per STATE.md research gap and D-07, investigating Shiki's client-side feasibilit
 
 **If this table is empty:** N/A -- three assumed claims identified above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Shiki theme for code blocks on paste view**
+1. **Shiki theme for code blocks on paste view** — RESOLVED
    - What we know: UI-SPEC specifies `github-light` theme. This is confirmed as a valid Shiki theme. [VERIFIED: shiki docs]
-   - What's unclear: Whether this is the best visual match for the overall paste.md aesthetic. Phase 5 will add dark mode with `github-dark`.
-   - Recommendation: Use `github-light` as specified. It matches the GitHub-style rendering users expect. Configure with single `theme` option (not dual `themes`) since dark mode ships in Phase 5.
+   - Resolution: Use `github-light` as specified. It matches the GitHub-style rendering users expect. Configure with single `theme` option (not dual `themes`) since dark mode ships in Phase 5.
 
-2. **TypeScript `@ts-expect-error` for MarkdownAsync**
+2. **TypeScript `@ts-expect-error` for MarkdownAsync** — RESOLVED
    - What we know: Some examples show `{/* @ts-expect-error Server Component */}` above `MarkdownAsync` usage. This suggests TypeScript may not fully understand async server component return types.
-   - What's unclear: Whether react-markdown 10.1.0's TypeScript definitions properly type `MarkdownAsync` for RSC usage with Next.js 16.
-   - Recommendation: Try without the `@ts-expect-error` first. If TypeScript errors occur, add it as a targeted suppression with a comment explaining why.
+   - Resolution: Try without the `@ts-expect-error` first. If TypeScript errors occur, add it as a targeted suppression with a comment explaining why.
 
 ## Environment Availability
 
