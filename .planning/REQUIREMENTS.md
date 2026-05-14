@@ -16,8 +16,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Rendering
 
-- [ ] **REND-01**: Paste content is rendered as GitHub Flavored Markdown (tables, task lists, strikethrough, autolinks)
-- [ ] **REND-02**: Code blocks in pastes display with syntax highlighting for 100+ languages
+- [x] **REND-01**: Paste content is rendered as GitHub Flavored Markdown (tables, task lists, strikethrough, autolinks)
+- [x] **REND-02**: Code blocks in pastes display with syntax highlighting for 100+ languages
 - [ ] **REND-03**: User sees a real-time Markdown preview while typing in the editor
 - [ ] **REND-04**: User can toggle between rendered view and raw Markdown source on a paste page
 
@@ -29,7 +29,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Security
 
-- [ ] **SECU-01**: Rendered Markdown output is sanitized to prevent XSS attacks
+- [x] **SECU-01**: Rendered Markdown output is sanitized to prevent XSS attacks
 - [ ] **SECU-02**: Application serves strict Content Security Policy headers
 - [ ] **SECU-03**: Paste creation is rate-limited per IP address
 - [x] **SECU-04**: Paste content size is limited (max 512KB)
@@ -94,14 +94,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CORE-02 | Phase 1 | Complete |
 | CORE-03 | Phase 1 | Complete |
 | CORE-04 | Phase 1 | Complete |
-| REND-01 | Phase 2 | Pending |
-| REND-02 | Phase 2 | Pending |
+| REND-01 | Phase 2 | Complete |
+| REND-02 | Phase 2 | Complete |
 | REND-03 | Phase 2 | Pending |
 | REND-04 | Phase 3 | Pending |
 | EDIT-01 | Phase 2 | Pending |
 | EDIT-02 | Phase 2 | Pending |
 | EDIT-03 | Phase 2 | Pending |
-| SECU-01 | Phase 2 | Pending |
+| SECU-01 | Phase 2 | Complete |
 | SECU-02 | Phase 4 | Pending |
 | SECU-03 | Phase 4 | Pending |
 | SECU-04 | Phase 1 | Complete |

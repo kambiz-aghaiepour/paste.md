@@ -56,7 +56,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 02-01-PLAN.md -- Install rendering dependencies, create MarkdownRenderer server component, wire into paste view
+- [x] 02-01-PLAN.md -- Install rendering dependencies, create MarkdownRenderer server component, wire into paste view
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md -- Create custom hooks and preview components, extend editor with split-pane, live preview, mobile toggle, localStorage
@@ -121,7 +121,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Path | 1/2 | Executing | - |
-| 2. Markdown Rendering & Editor | 0/3 | Not started | - |
+| 2. Markdown Rendering & Editor | 1/3 | In Progress|  |
 | 3. Paste Lifecycle | 0/3 | Not started | - |
 | 4. Security Hardening | 0/1 | Not started | - |
 | 5. UI Polish & Experience | 0/3 | Not started | - |
