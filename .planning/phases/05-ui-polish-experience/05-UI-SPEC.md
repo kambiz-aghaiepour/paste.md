@@ -50,9 +50,11 @@ Exceptions: Touch targets use `min-h-[44px] min-w-[44px]` per D-12 (WCAG / Apple
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.5 | `text-sm font-medium` |
+| Label | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Heading (page) | 30px | 700 (bold) | 1.2 | `text-3xl font-bold` |
 | Display (404/410) | 36px | 700 (bold) | 1.2 | `text-4xl font-bold` |
+
+Weights declared: 2 -- regular (400) for body and labels, bold (700) for headings and display. Labels are distinguished from body text by context and color (e.g. `text-gray-500` for secondary labels), not by font weight.
 
 Source: Existing codebase uses `text-sm` (14px) for all body/label text, `text-3xl` (30px) for home heading, `text-4xl` (36px) for 404 display. This phase preserves these -- no typography changes.
 
