@@ -38,7 +38,7 @@ Plans:
 - [x] 01-01-PLAN.md -- Walking Skeleton: scaffold project, data layer, and complete create-view data path
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-02-PLAN.md -- Automated tests for all requirements and human verification checkpoint
+- [x] 01-02-PLAN.md -- Automated tests for all requirements and human verification checkpoint
 
 ### Phase 2: Markdown Rendering & Editor
 **Goal**: Users see beautifully rendered Markdown with syntax-highlighted code blocks, and can preview their paste in real-time while editing
