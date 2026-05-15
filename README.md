@@ -36,19 +36,8 @@ The app starts at `http://localhost:3000`. The SQLite database is created automa
 
 #### 1. Prepare the server
 
-**Ubuntu/Debian:**
-
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Build tools for better-sqlite3 native compilation
-sudo apt-get install -y build-essential python3
-```
-
-**RHEL/Fedora/CentOS:**
-
-```bash
+# Install Node.js 22
 curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
 sudo dnf install -y nodejs
 
@@ -77,12 +66,7 @@ mkdir -p /opt/paste-md/data
 #### 4. Create a system user
 
 ```bash
-# Ubuntu/Debian
-sudo useradd --system --no-create-home --shell /usr/sbin/nologin paste-md
-
-# RHEL/Fedora/CentOS
 sudo useradd --system --no-create-home --shell /sbin/nologin paste-md
-
 sudo chown -R paste-md:paste-md /opt/paste-md
 ```
 
@@ -127,49 +111,19 @@ sudo systemctl status paste-md
 
 #### 6. Set up a reverse proxy (nginx)
 
-**Ubuntu/Debian:**
-
-```bash
-sudo apt-get install -y nginx
-```
-
-**RHEL/Fedora/CentOS:**
-
 ```bash
 sudo dnf install -y nginx
 sudo systemctl enable --now nginx
-sudo setsebool -P httpd_can_network_connect 1  # allow nginx to proxy
+
+# Allow nginx to proxy to Node.js (SELinux)
+sudo setsebool -P httpd_can_network_connect 1
+
+# Open firewall ports
 sudo firewall-cmd --permanent --add-service=http --add-service=https
 sudo firewall-cmd --reload
 ```
 
-**Ubuntu/Debian** — create `/etc/nginx/sites-available/paste-md`:
-
-```nginx
-server {
-    listen 80;
-    server_name paste.example.com;
-
-    client_max_body_size 2M;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-```bash
-sudo ln -s /etc/nginx/sites-available/paste-md /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-**RHEL/Fedora/CentOS** — create `/etc/nginx/conf.d/paste-md.conf`:
+Create `/etc/nginx/conf.d/paste-md.conf`:
 
 ```nginx
 server {
@@ -195,15 +149,6 @@ sudo systemctl reload nginx
 ```
 
 #### 7. Enable HTTPS with Let's Encrypt
-
-**Ubuntu/Debian:**
-
-```bash
-sudo apt-get install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d paste.example.com
-```
-
-**RHEL/Fedora/CentOS:**
 
 ```bash
 sudo dnf install -y certbot python3-certbot-nginx
