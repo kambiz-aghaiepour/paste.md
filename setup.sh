@@ -11,6 +11,7 @@ SERVICE_NAME="paste-md"
 NODE_PORT=3000
 DOMAIN=""
 REPO_URL=""
+SSL_DIR="/etc/nginx/ssl/paste-md"
 
 usage() {
     echo "Usage: sudo bash setup.sh [--domain DOMAIN] [--repo REPO_URL]"
@@ -124,10 +125,43 @@ setsebool -P httpd_can_network_connect 1
 
 SERVER_NAME="${DOMAIN:-_}"
 
+echo "==> Generating self-signed SSL certificate"
+mkdir -p "$SSL_DIR"
+openssl req -x509 -nodes -days 365 \
+    -newkey rsa:2048 \
+    -keyout "$SSL_DIR/selfsigned.key" \
+    -out "$SSL_DIR/selfsigned.crt" \
+    -subj "/CN=${DOMAIN:-paste-md}"
+openssl dhparam -out "$SSL_DIR/dhparam.pem" 2048
+
+chmod 600 "$SSL_DIR/selfsigned.key"
+chmod 644 "$SSL_DIR/selfsigned.crt" "$SSL_DIR/dhparam.pem"
+
+SSL_CERT="$SSL_DIR/selfsigned.crt"
+SSL_KEY="$SSL_DIR/selfsigned.key"
+
 cat > /etc/nginx/conf.d/paste-md.conf <<EOF
 server {
     listen 80;
     server_name ${SERVER_NAME};
+    return 301 https://\$host\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name ${SERVER_NAME};
+
+    ssl_certificate ${SSL_CERT};
+    ssl_certificate_key ${SSL_KEY};
+    ssl_dhparam ${SSL_DIR}/dhparam.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
 
     client_max_body_size 2M;
 
@@ -146,13 +180,15 @@ nginx -t
 systemctl reload nginx
 
 if [[ -n "$DOMAIN" ]]; then
-    echo "==> Setting up HTTPS with Let's Encrypt"
+    echo "==> Replacing self-signed cert with Let's Encrypt"
     dnf install -y certbot python3-certbot-nginx
     certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email
-    echo "    HTTPS configured for ${DOMAIN}"
+    echo "    HTTPS configured with Let's Encrypt for ${DOMAIN}"
 else
-    echo "==> Skipping HTTPS (no --domain provided)"
-    echo "    To enable later: sudo certbot --nginx -d your-domain.com"
+    echo "==> Using self-signed SSL certificate"
+    echo "    Cert: ${SSL_CERT}"
+    echo "    Key:  ${SSL_KEY}"
+    echo "    To switch to Let's Encrypt later: sudo certbot --nginx -d your-domain.com"
 fi
 
 echo ""
@@ -161,6 +197,6 @@ echo "    Service: systemctl status ${SERVICE_NAME}"
 if [[ -n "$DOMAIN" ]]; then
     echo "    URL:     https://${DOMAIN}"
 else
-    echo "    URL:     http://$(hostname -I | awk '{print $1}')"
+    echo "    URL:     https://$(hostname -I | awk '{print $1}') (self-signed)"
 fi
 echo "    Data:    ${INSTALL_DIR}/data/paste.db"
