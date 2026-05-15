@@ -63,14 +63,20 @@ echo "==> Installing dependencies and building"
 npm ci --include=dev
 npm run build
 
-echo "==> Creating data directory"
-mkdir -p "$INSTALL_DIR/data"
-
 echo "==> Creating system user: ${SERVICE_USER}"
 if ! id "$SERVICE_USER" &>/dev/null; then
     useradd --system --no-create-home --shell /sbin/nologin "$SERVICE_USER"
 fi
+
+echo "==> Creating data directory with correct permissions"
+mkdir -p "$INSTALL_DIR/data"
 chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+chmod 755 "$INSTALL_DIR/data"
+# SQLite WAL mode creates -wal and -shm sidecar files in the data directory,
+# so the service user needs write access to both the directory and the db file.
+if [[ -f "$INSTALL_DIR/data/paste.db" ]]; then
+    chmod 644 "$INSTALL_DIR/data/paste.db"
+fi
 
 echo "==> Creating systemd service"
 cat > "/etc/systemd/system/${SERVICE_NAME}.service" <<EOF

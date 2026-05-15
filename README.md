@@ -74,11 +74,13 @@ npm run build
 
 #### 3. Create a data directory
 
-The SQLite database lives at `data/paste.db` relative to the working directory. Ensure the directory exists and is writable:
+The SQLite database lives at `data/paste.db` relative to the working directory. SQLite with WAL mode also creates `paste.db-wal` and `paste.db-shm` sidecar files, so the process needs **write access to both the file and the directory**:
 
 ```bash
 mkdir -p /opt/paste-md/data
 ```
+
+> **Note:** Ownership is set in the next step. If you see `SQLITE_READONLY` errors, check that the service user owns the `data/` directory and its contents — see [Troubleshooting](#troubleshooting) below.
 
 #### 4. Create a system user
 
@@ -311,6 +313,29 @@ Or with a cron job:
 ```bash
 0 3 * * * sqlite3 /opt/paste-md/data/paste.db ".backup '/backups/paste-$(date +\%Y\%m\%d).db'"
 ```
+
+## Troubleshooting
+
+### `SQLITE_READONLY` — attempt to write a readonly database
+
+SQLite in WAL mode needs write access to the `data/` directory (not just the `.db` file) because it creates `-wal` and `-shm` sidecar files. This error means the Node.js process can't write to the database or its directory.
+
+**Check permissions:**
+
+```bash
+ls -la /opt/paste-md/data/
+```
+
+**Fix:**
+
+```bash
+sudo chown -R paste-md:paste-md /opt/paste-md/data
+sudo chmod 755 /opt/paste-md/data
+sudo chmod 644 /opt/paste-md/data/paste.db 2>/dev/null || true
+sudo systemctl restart paste-md
+```
+
+If using `ProtectSystem=strict` in the systemd unit (the default), ensure `ReadWritePaths=/opt/paste-md/data` is present in the service file.
 
 ## Environment Variables
 
