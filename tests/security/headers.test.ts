@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { NextRequest } from "next/server";
-import { proxy } from "@/app/proxy";
-import nextConfig from "../../next.config";
+import { proxy } from "@/proxy";
 
 function makeProxyRequest(
   path: string,
@@ -28,13 +27,11 @@ describe("SECU-03: Rate limiting on POST /api/paste", () => {
   it("SECU-03: blocks 6th POST request from same IP with 429", () => {
     const ip = "rate-test-block-" + Date.now();
 
-    // Exhaust the 5-request limit
     for (let i = 0; i < 5; i++) {
       const request = makeProxyRequest("/api/paste", "POST", ip);
       proxy(request);
     }
 
-    // 6th request should be blocked
     const request = makeProxyRequest("/api/paste", "POST", ip);
     const response = proxy(request);
     expect(response.status).toBe(429);
@@ -71,18 +68,15 @@ describe("SECU-03: Rate limiting on POST /api/paste", () => {
     const ip1 = "rate-test-ip1-" + Date.now();
     const ip2 = "rate-test-ip2-" + Date.now();
 
-    // Exhaust ip1
     for (let i = 0; i < 5; i++) {
       proxy(makeProxyRequest("/api/paste", "POST", ip1));
     }
 
-    // Verify ip1 is limited
     const blockedResponse = proxy(
       makeProxyRequest("/api/paste", "POST", ip1),
     );
     expect(blockedResponse.status).toBe(429);
 
-    // ip2 should not be limited
     const allowedResponse = proxy(
       makeProxyRequest("/api/paste", "POST", ip2),
     );
@@ -92,7 +86,6 @@ describe("SECU-03: Rate limiting on POST /api/paste", () => {
   it("SECU-03: GET /api/paste is not rate-limited", () => {
     const ip = "rate-test-get-" + Date.now();
 
-    // Send more than 5 GET requests -- none should be limited
     for (let i = 0; i < 10; i++) {
       const request = makeProxyRequest("/api/paste", "GET", ip);
       const response = proxy(request);
@@ -101,76 +94,50 @@ describe("SECU-03: Rate limiting on POST /api/paste", () => {
   });
 });
 
-describe("SECU-02: CSP and security headers configuration", () => {
-  it("SECU-02: next.config.ts headers() returns Content-Security-Policy", async () => {
-    const headersFn = nextConfig.headers;
-    expect(headersFn).toBeDefined();
+describe("SECU-02: CSP and security headers via proxy", () => {
+  function makePageRequest(path = "/"): NextRequest {
+    return new NextRequest(new URL(`http://localhost:3000${path}`));
+  }
 
-    const headerEntries = await headersFn!();
-    const globalEntry = headerEntries.find(
-      (entry) => entry.source === "/(.*)",
-    );
-    expect(globalEntry).toBeDefined();
-
-    const cspHeader = globalEntry!.headers.find(
-      (h) => h.key === "Content-Security-Policy",
-    );
-    expect(cspHeader).toBeDefined();
-    expect(cspHeader!.value).toContain("default-src 'self'");
-    expect(cspHeader!.value).toContain("script-src 'self'");
+  it("SECU-02: proxy sets Content-Security-Policy header with nonce", () => {
+    const response = proxy(makePageRequest());
+    const csp = response.headers.get("Content-Security-Policy");
+    expect(csp).toBeDefined();
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("script-src 'self'");
+    expect(csp).toMatch(/nonce-[A-Za-z0-9+/=]+/);
+    expect(csp).toContain("'strict-dynamic'");
   });
 
-  it("UI-04: CSP script-src includes FOWT prevention script hash", async () => {
-    const headerEntries = await nextConfig.headers!();
-    const globalEntry = headerEntries.find(
-      (entry) => entry.source === "/(.*)",
-    );
+  it("SECU-02: proxy generates unique nonce per request", () => {
+    const csp1 = proxy(makePageRequest()).headers.get(
+      "Content-Security-Policy",
+    )!;
+    const csp2 = proxy(makePageRequest()).headers.get(
+      "Content-Security-Policy",
+    )!;
 
-    const cspHeader = globalEntry!.headers.find(
-      (h) => h.key === "Content-Security-Policy",
-    );
-    expect(cspHeader).toBeDefined();
-    // In production mode (NODE_ENV !== "development"), script-src should
-    // contain a sha256- hash for the FOWT prevention inline script
-    expect(cspHeader!.value).toContain("sha256-");
+    const nonce1 = csp1.match(/nonce-([A-Za-z0-9+/=]+)/)?.[1];
+    const nonce2 = csp2.match(/nonce-([A-Za-z0-9+/=]+)/)?.[1];
+    expect(nonce1).toBeDefined();
+    expect(nonce2).toBeDefined();
+    expect(nonce1).not.toBe(nonce2);
   });
 
-  it("SECU-02: next.config.ts headers() returns X-Content-Type-Options", async () => {
-    const headerEntries = await nextConfig.headers!();
-    const globalEntry = headerEntries.find(
-      (entry) => entry.source === "/(.*)",
-    );
-
-    const header = globalEntry!.headers.find(
-      (h) => h.key === "X-Content-Type-Options",
-    );
-    expect(header).toBeDefined();
-    expect(header!.value).toBe("nosniff");
+  it("SECU-02: proxy sets X-Content-Type-Options", () => {
+    const response = proxy(makePageRequest());
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
   });
 
-  it("SECU-02: next.config.ts headers() returns X-Frame-Options", async () => {
-    const headerEntries = await nextConfig.headers!();
-    const globalEntry = headerEntries.find(
-      (entry) => entry.source === "/(.*)",
-    );
-
-    const header = globalEntry!.headers.find(
-      (h) => h.key === "X-Frame-Options",
-    );
-    expect(header).toBeDefined();
-    expect(header!.value).toBe("DENY");
+  it("SECU-02: proxy sets X-Frame-Options", () => {
+    const response = proxy(makePageRequest());
+    expect(response.headers.get("X-Frame-Options")).toBe("DENY");
   });
 
-  it("SECU-02: next.config.ts headers() returns Referrer-Policy", async () => {
-    const headerEntries = await nextConfig.headers!();
-    const globalEntry = headerEntries.find(
-      (entry) => entry.source === "/(.*)",
+  it("SECU-02: proxy sets Referrer-Policy", () => {
+    const response = proxy(makePageRequest());
+    expect(response.headers.get("Referrer-Policy")).toBe(
+      "strict-origin-when-cross-origin",
     );
-
-    const header = globalEntry!.headers.find(
-      (h) => h.key === "Referrer-Policy",
-    );
-    expect(header).toBeDefined();
-    expect(header!.value).toBe("strict-origin-when-cross-origin");
   });
 });

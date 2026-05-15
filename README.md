@@ -32,6 +32,23 @@ The app starts at `http://localhost:3000`. The SQLite database is created automa
 
 ## Deploy to a Linux Server
 
+### Quick Setup (Rocky Linux)
+
+A single script handles the full deployment — Node.js, build, systemd, nginx, firewall, and optional HTTPS:
+
+```bash
+# With a domain (enables HTTPS via Let's Encrypt)
+sudo bash setup.sh --domain paste.example.com
+
+# Without a domain (HTTP only, serves on the server's IP)
+sudo bash setup.sh
+
+# From a git repo instead of a local copy
+sudo bash setup.sh --repo https://github.com/your-user/paste.md.git --domain paste.example.com
+```
+
+For step-by-step manual instructions, see below.
+
 ### Option A: Standalone Node.js (recommended for single-server setups)
 
 #### 1. Prepare the server
@@ -119,6 +136,10 @@ sudo systemctl enable --now nginx
 sudo setsebool -P httpd_can_network_connect 1
 
 # Open firewall ports
+# On Rocky Linux, firewalld may be masked by default — unmask and start it first
+sudo systemctl unmask firewalld
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
 sudo firewall-cmd --permanent --add-service=http --add-service=https
 sudo firewall-cmd --reload
 ```

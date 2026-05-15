@@ -5,12 +5,17 @@ import { createRateLimiter } from "@/lib/rate-limiter";
 
 export const config = {
   matcher: [
-    "/:slug([A-Za-z0-9_-]{8})",
-    "/api/paste",
+    {
+      source: "/((?!_next/static|_next/image|favicon.ico).*)",
+    },
   ],
 };
 
 const rateLimiter = createRateLimiter(5, 60_000);
+
+const isDev = process.env.NODE_ENV === "development";
+
+const SLUG_PATTERN = /^\/[A-Za-z0-9_-]{8}$/;
 
 function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -20,12 +25,34 @@ function getClientIp(request: NextRequest): string {
   return "unknown";
 }
 
+function buildCspHeader(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self'",
+    "font-src 'self'",
+    `connect-src 'self'${isDev ? " ws://localhost:3000" : ""}`,
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+}
+
+function setSecurityHeaders(
+  response: NextResponse,
+  csp: string,
+): void {
+  response.headers.set("Content-Security-Policy", csp);
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+}
+
 export function proxy(request: NextRequest) {
-  // Rate limiting: only POST /api/paste
-  if (
-    request.nextUrl.pathname === "/api/paste" &&
-    request.method === "POST"
-  ) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/api/paste" && request.method === "POST") {
     const ip = getClientIp(request);
     const result = rateLimiter.check(ip);
 
@@ -40,21 +67,15 @@ export function proxy(request: NextRequest) {
         },
       );
     }
-    return NextResponse.next();
   }
 
-  // GET /api/paste passes through without rate limiting
-  if (request.nextUrl.pathname === "/api/paste") {
-    return NextResponse.next();
-  }
+  if (SLUG_PATTERN.test(pathname)) {
+    const slug = pathname.slice(1);
+    const paste = getPasteById(slug);
 
-  // Existing 410 logic for expired pastes
-  const slug = request.nextUrl.pathname.slice(1);
-  const paste = getPasteById(slug);
-
-  if (paste?.expiresAt && Date.now() / 1000 > paste.expiresAt) {
-    return new Response(
-      `<!DOCTYPE html>
+    if (paste?.expiresAt && Date.now() / 1000 > paste.expiresAt) {
+      return new Response(
+        `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Expired - paste.md</title></head>
 <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;background:#fff;color:#1f2937">
@@ -71,12 +92,24 @@ export function proxy(request: NextRequest) {
   <a href="/" style="color:#2563eb;text-decoration:none">Back to home</a>
 </body>
 </html>`,
-      {
-        status: 410,
-        headers: { "Content-Type": "text/html; charset=utf-8" },
-      },
-    );
+        {
+          status: 410,
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        },
+      );
+    }
   }
 
-  return NextResponse.next();
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = buildCspHeader(nonce);
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  setSecurityHeaders(response, csp);
+
+  return response;
 }
