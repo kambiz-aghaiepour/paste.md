@@ -181,14 +181,22 @@ systemctl reload nginx
 
 if [[ -n "$DOMAIN" ]]; then
     echo "==> Replacing self-signed cert with Let's Encrypt"
+    dnf install -y epel-release
     dnf install -y certbot python3-certbot-nginx
-    certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email
-    echo "    HTTPS configured with Let's Encrypt for ${DOMAIN}"
+    if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email; then
+        echo "    HTTPS configured with Let's Encrypt for ${DOMAIN}"
+    else
+        echo "    WARNING: Let's Encrypt failed (DNS not pointing here, or port 80 not reachable)."
+        echo "    The site is running with a self-signed certificate."
+        echo "    Once DNS is configured, retry with: sudo certbot --nginx -d ${DOMAIN}"
+    fi
 else
     echo "==> Using self-signed SSL certificate"
     echo "    Cert: ${SSL_CERT}"
     echo "    Key:  ${SSL_KEY}"
-    echo "    To switch to Let's Encrypt later: sudo certbot --nginx -d your-domain.com"
+    echo "    To switch to Let's Encrypt later:"
+    echo "      sudo dnf install -y epel-release certbot python3-certbot-nginx"
+    echo "      sudo certbot --nginx -d your-domain.com"
 fi
 
 echo ""

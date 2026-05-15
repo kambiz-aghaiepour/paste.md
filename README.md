@@ -174,6 +174,7 @@ sudo systemctl reload nginx
 #### 7. Enable HTTPS with Let's Encrypt
 
 ```bash
+sudo dnf install -y epel-release
 sudo dnf install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d paste.example.com
 ```
