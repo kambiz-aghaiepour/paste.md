@@ -37,10 +37,16 @@ The app starts at `http://localhost:3000`. The SQLite database is created automa
 A single script handles the full deployment — Node.js, build, systemd, nginx, firewall, and optional HTTPS:
 
 ```bash
-# With a domain (enables HTTPS via Let's Encrypt)
+# Public-facing server (attempts Let's Encrypt)
 sudo bash setup.sh --domain paste.example.com
 
-# Without a domain (HTTP only, serves on the server's IP)
+# Internal/corporate network (self-signed cert, no Let's Encrypt)
+sudo bash setup.sh --internal --domain paste.internal.corp
+
+# Internal with corporate CA certificate
+sudo bash setup.sh --internal --ssl-cert /path/to/cert.crt --ssl-key /path/to/key.key
+
+# Without a domain (self-signed, serves on the server's IP)
 sudo bash setup.sh
 
 # From a git repo instead of a local copy

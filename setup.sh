@@ -3,7 +3,7 @@ set -euo pipefail
 
 # paste.md — Rocky Linux deployment script
 # Run as root or with sudo on a fresh Rocky Linux server.
-# Usage: sudo bash setup.sh [--domain paste.example.com] [--repo https://github.com/user/paste.md.git]
+# Usage: sudo bash setup.sh [--domain DOMAIN] [--repo REPO_URL] [--internal] [--ssl-cert PATH --ssl-key PATH]
 
 INSTALL_DIR="/opt/paste-md"
 SERVICE_USER="paste-md"
@@ -11,14 +11,26 @@ SERVICE_NAME="paste-md"
 NODE_PORT=3000
 DOMAIN=""
 REPO_URL=""
+INTERNAL=false
+CUSTOM_SSL_CERT=""
+CUSTOM_SSL_KEY=""
 SSL_DIR="/etc/nginx/ssl/paste-md"
 
 usage() {
-    echo "Usage: sudo bash setup.sh [--domain DOMAIN] [--repo REPO_URL]"
+    echo "Usage: sudo bash setup.sh [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --domain   Server domain name for nginx and Let's Encrypt (e.g. paste.example.com)"
-    echo "  --repo     Git repository URL to clone (default: current directory copy)"
+    echo "  --domain DOMAIN     Server domain name for nginx (e.g. paste.example.com)"
+    echo "  --repo REPO_URL     Git repository URL to clone (default: current directory copy)"
+    echo "  --internal          Internal/corporate deployment (skip Let's Encrypt)"
+    echo "  --ssl-cert PATH     Path to custom SSL certificate (e.g. corporate CA)"
+    echo "  --ssl-key PATH      Path to custom SSL private key"
+    echo ""
+    echo "SSL modes:"
+    echo "  Default:             Self-signed cert, with Let's Encrypt instructions"
+    echo "  --domain:            Self-signed cert, then attempts Let's Encrypt upgrade"
+    echo "  --internal:          Self-signed cert, no Let's Encrypt (for intranet hosts)"
+    echo "  --ssl-cert/--ssl-key: Uses provided certificate files (e.g. from corporate CA)"
     echo ""
     echo "If --domain is omitted, nginx is configured with the server's IP address."
     echo "If --repo is omitted, the script copies the current directory to ${INSTALL_DIR}."
@@ -27,12 +39,31 @@ usage() {
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --domain) DOMAIN="$2"; shift 2 ;;
-        --repo)   REPO_URL="$2"; shift 2 ;;
-        --help|-h) usage ;;
+        --domain)   DOMAIN="$2"; shift 2 ;;
+        --repo)     REPO_URL="$2"; shift 2 ;;
+        --internal) INTERNAL=true; shift ;;
+        --ssl-cert) CUSTOM_SSL_CERT="$2"; shift 2 ;;
+        --ssl-key)  CUSTOM_SSL_KEY="$2"; shift 2 ;;
+        --help|-h)  usage ;;
         *) echo "Unknown option: $1"; usage ;;
     esac
 done
+
+if [[ -n "$CUSTOM_SSL_CERT" && -z "$CUSTOM_SSL_KEY" ]] || [[ -z "$CUSTOM_SSL_CERT" && -n "$CUSTOM_SSL_KEY" ]]; then
+    echo "Error: --ssl-cert and --ssl-key must be used together."
+    exit 1
+fi
+
+if [[ -n "$CUSTOM_SSL_CERT" ]]; then
+    if [[ ! -f "$CUSTOM_SSL_CERT" ]]; then
+        echo "Error: SSL certificate not found: $CUSTOM_SSL_CERT"
+        exit 1
+    fi
+    if [[ ! -f "$CUSTOM_SSL_KEY" ]]; then
+        echo "Error: SSL key not found: $CUSTOM_SSL_KEY"
+        exit 1
+    fi
+fi
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root (or with sudo)."
@@ -125,20 +156,31 @@ setsebool -P httpd_can_network_connect 1
 
 SERVER_NAME="${DOMAIN:-_}"
 
-echo "==> Generating self-signed SSL certificate"
 mkdir -p "$SSL_DIR"
-openssl req -x509 -nodes -days 365 \
-    -newkey rsa:2048 \
-    -keyout "$SSL_DIR/selfsigned.key" \
-    -out "$SSL_DIR/selfsigned.crt" \
-    -subj "/CN=${DOMAIN:-paste-md}"
+
+if [[ -n "$CUSTOM_SSL_CERT" ]]; then
+    echo "==> Installing custom SSL certificate"
+    cp "$CUSTOM_SSL_CERT" "$SSL_DIR/custom.crt"
+    cp "$CUSTOM_SSL_KEY" "$SSL_DIR/custom.key"
+    chmod 644 "$SSL_DIR/custom.crt"
+    chmod 600 "$SSL_DIR/custom.key"
+    SSL_CERT="$SSL_DIR/custom.crt"
+    SSL_KEY="$SSL_DIR/custom.key"
+else
+    echo "==> Generating self-signed SSL certificate"
+    openssl req -x509 -nodes -days 365 \
+        -newkey rsa:2048 \
+        -keyout "$SSL_DIR/selfsigned.key" \
+        -out "$SSL_DIR/selfsigned.crt" \
+        -subj "/CN=${DOMAIN:-paste-md}"
+    chmod 600 "$SSL_DIR/selfsigned.key"
+    chmod 644 "$SSL_DIR/selfsigned.crt"
+    SSL_CERT="$SSL_DIR/selfsigned.crt"
+    SSL_KEY="$SSL_DIR/selfsigned.key"
+fi
+
 openssl dhparam -out "$SSL_DIR/dhparam.pem" 2048
-
-chmod 600 "$SSL_DIR/selfsigned.key"
-chmod 644 "$SSL_DIR/selfsigned.crt" "$SSL_DIR/dhparam.pem"
-
-SSL_CERT="$SSL_DIR/selfsigned.crt"
-SSL_KEY="$SSL_DIR/selfsigned.key"
+chmod 644 "$SSL_DIR/dhparam.pem"
 
 cat > /etc/nginx/conf.d/paste-md.conf <<EOF
 server {
@@ -179,7 +221,18 @@ EOF
 nginx -t
 systemctl reload nginx
 
-if [[ -n "$DOMAIN" ]]; then
+if [[ -n "$CUSTOM_SSL_CERT" ]]; then
+    echo "==> Using custom SSL certificate"
+    echo "    Cert: ${SSL_CERT}"
+    echo "    Key:  ${SSL_KEY}"
+elif $INTERNAL; then
+    echo "==> Internal deployment — skipping Let's Encrypt"
+    echo "    Using self-signed certificate (expected for intranet hosts)."
+    echo "    Cert: ${SSL_CERT}"
+    echo "    Key:  ${SSL_KEY}"
+    echo "    To use a corporate CA certificate, re-run with:"
+    echo "      sudo bash setup.sh --internal --ssl-cert /path/to/cert.crt --ssl-key /path/to/key.key"
+elif [[ -n "$DOMAIN" ]]; then
     echo "==> Replacing self-signed cert with Let's Encrypt"
     dnf install -y epel-release
     dnf install -y certbot python3-certbot-nginx
@@ -199,12 +252,19 @@ else
     echo "      sudo certbot --nginx -d your-domain.com"
 fi
 
+CERT_LABEL=""
+if [[ -n "$CUSTOM_SSL_CERT" ]]; then
+    CERT_LABEL="custom cert"
+elif $INTERNAL || [[ -z "$DOMAIN" ]]; then
+    CERT_LABEL="self-signed"
+fi
+
 echo ""
 echo "==> Deployment complete!"
 echo "    Service: systemctl status ${SERVICE_NAME}"
 if [[ -n "$DOMAIN" ]]; then
-    echo "    URL:     https://${DOMAIN}"
+    echo "    URL:     https://${DOMAIN}${CERT_LABEL:+ ($CERT_LABEL)}"
 else
-    echo "    URL:     https://$(hostname -I | awk '{print $1}') (self-signed)"
+    echo "    URL:     https://$(hostname -I | awk '{print $1}') ($CERT_LABEL)"
 fi
 echo "    Data:    ${INSTALL_DIR}/data/paste.db"
