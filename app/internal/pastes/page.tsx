@@ -1,4 +1,5 @@
 import { getAllPastes } from "@/lib/db/queries";
+import { DeletePasteButton } from "./delete-paste-button";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -46,7 +47,8 @@ export default async function InternalPastesPage() {
                 <th className="py-3 pr-4">ID</th>
                 <th className="py-3 pr-4">Created</th>
                 <th className="py-3 pr-4">Expires</th>
-                <th className="py-3 text-right">Size</th>
+                <th className="py-3 pr-4 text-right">Size</th>
+                <th className="py-3 w-12"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -66,8 +68,11 @@ export default async function InternalPastesPage() {
                   <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-300">
                     {formatExpiration(paste.expiresAt)}
                   </td>
-                  <td className="py-2.5 text-right text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                  <td className="py-2.5 pr-4 text-right text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     {formatSize(paste.sizeBytes)}
+                  </td>
+                  <td className="py-2.5 text-center">
+                    <DeletePasteButton pasteId={paste.id} />
                   </td>
                 </tr>
               ))}

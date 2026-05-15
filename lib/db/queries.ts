@@ -27,6 +27,11 @@ export function getAllPastes(): PasteSummary[] {
     .all();
 }
 
+export function deletePasteById(id: string): boolean {
+  const result = db.delete(pastes).where(eq(pastes.id, id)).run();
+  return result.changes > 0;
+}
+
 export function deleteExpiredPastes(): number {
   const now = Math.floor(Date.now() / 1000);
   const result = db
