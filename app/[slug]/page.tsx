@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPasteById } from "@/lib/db/queries";
 import { MarkdownRenderer } from "@/app/components/markdown-renderer";
@@ -29,6 +30,26 @@ export default async function PastePage({
   }
 
   const now = Math.floor(Date.now() / 1000);
+
+  if (paste.expiresAt && now > paste.expiresAt) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center">
+        <h1 className="mb-4 text-4xl font-bold text-gray-400 dark:text-gray-500">
+          Expired
+        </h1>
+        <p className="mb-8 text-gray-500 dark:text-gray-400">
+          This paste has expired.
+        </p>
+        <Link
+          href="/"
+          className="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          Back to home
+        </Link>
+      </main>
+    );
+  }
+
   const remaining = paste.expiresAt ? paste.expiresAt - now : null;
 
   return (

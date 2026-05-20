@@ -2,6 +2,8 @@ import { MarkdownAsync } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeShiki from "@shikijs/rehype";
+import { rehypeExtractMermaid } from "@/app/lib/rehype-extract-mermaid";
+import { markdownComponents } from "./markdown-components";
 
 interface MarkdownRendererProps {
   content: string;
@@ -14,11 +16,13 @@ export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
           rehypeSanitize,
+          rehypeExtractMermaid,
           [rehypeShiki, {
             themes: { light: "github-light", dark: "github-dark" },
             defaultColor: "light",
           }],
         ]}
+        components={markdownComponents}
       >
         {content}
       </MarkdownAsync>

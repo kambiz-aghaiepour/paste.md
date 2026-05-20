@@ -3,6 +3,8 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import { rehypeExtractMermaid } from "@/app/lib/rehype-extract-mermaid";
+import { markdownComponents } from "./markdown-components";
 
 interface MarkdownPreviewProps {
   content: string;
@@ -18,7 +20,8 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
     >
       <Markdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize]}
+        rehypePlugins={[rehypeSanitize, rehypeExtractMermaid]}
+        components={markdownComponents}
       >
         {content}
       </Markdown>

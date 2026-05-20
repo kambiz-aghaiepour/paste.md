@@ -7,6 +7,7 @@ import remarkRehype from "remark-rehype";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeShiki from "@shikijs/rehype";
 import rehypeStringify from "rehype-stringify";
+import { rehypeExtractMermaid } from "../../app/lib/rehype-extract-mermaid";
 
 /**
  * Processes Markdown through the same plugin pipeline as MarkdownRenderer:
@@ -21,6 +22,7 @@ async function processMarkdown(input: string): Promise<string> {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize)
+    .use(rehypeExtractMermaid)
     .use(rehypeShiki, { themes: { light: "github-light", dark: "github-dark" }, defaultColor: "light" })
     .use(rehypeStringify)
     .process(input);
@@ -106,6 +108,49 @@ const greeting = "Hello";
 
     // Shiki dual-theme mode generates --shiki-dark CSS variables
     expect(output).toContain("--shiki-dark");
+  });
+
+  it("REND-03: transforms mermaid code blocks into data-mermaid-source divs", async () => {
+    const input = `\`\`\`mermaid
+graph TD;
+    A-->B;
+    B-->C;
+\`\`\``;
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain('data-mermaid-source="');
+    expect(output).not.toContain("<pre");
+    expect(output).toContain("graph TD;");
+  });
+
+  it("REND-03: preserves non-mermaid code blocks through mermaid extraction", async () => {
+    const input = `\`\`\`javascript
+const x = 1;
+\`\`\``;
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain("<pre");
+    expect(output).toContain("<span");
+    expect(output).toContain("style=");
+    expect(output).not.toContain("data-mermaid-source");
+  });
+
+  it("REND-03: handles mermaid and code blocks in the same document", async () => {
+    const input = `\`\`\`mermaid
+graph LR; A-->B;
+\`\`\`
+
+\`\`\`python
+print("hello")
+\`\`\``;
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain('data-mermaid-source="graph LR; A-->B;"');
+    expect(output).toContain("<pre");
+    expect(output).toContain("style=");
   });
 
   it("SECU-01: preserves Shiki styles after sanitization", async () => {

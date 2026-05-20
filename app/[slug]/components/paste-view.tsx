@@ -26,26 +26,44 @@ export function PasteView({ content, renderedContent }: PasteViewProps) {
     const preElements = container.querySelectorAll("pre");
 
     for (const pre of preElements) {
-      // Skip if already wrapped
       if (pre.parentElement?.classList.contains("relative")) continue;
 
-      // Wrap pre in a relative container for button positioning
       const wrapper = document.createElement("div");
       wrapper.className = "relative group";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
-      // Create a container for the copy button
       const buttonContainer = document.createElement("div");
       buttonContainer.className =
         "absolute top-2 right-2 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-150";
       wrapper.appendChild(buttonContainer);
 
-      // Render CopyButton into the container
       const root = createRoot(buttonContainer);
       root.render(
         <CopyButton textContent={pre.textContent ?? ""} />,
       );
+      rootsRef.current.push(root);
+    }
+
+    const mermaidDiagrams =
+      container.querySelectorAll<HTMLElement>("[data-mermaid-source]");
+
+    for (const diagram of mermaidDiagrams) {
+      if (diagram.parentElement?.classList.contains("relative")) continue;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "relative group";
+      diagram.parentNode?.insertBefore(wrapper, diagram);
+      wrapper.appendChild(diagram);
+
+      const buttonContainer = document.createElement("div");
+      buttonContainer.className =
+        "absolute top-2 right-2 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-150";
+      wrapper.appendChild(buttonContainer);
+
+      const source = diagram.getAttribute("data-mermaid-source") ?? "";
+      const root = createRoot(buttonContainer);
+      root.render(<CopyButton textContent={source} />);
       rootsRef.current.push(root);
     }
 
