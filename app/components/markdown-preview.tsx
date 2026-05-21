@@ -1,10 +1,51 @@
 "use client";
 
+import type { Components } from "react-markdown";
+import type { Element } from "hast";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import { rehypeExtractMermaid } from "@/app/lib/rehype-extract-mermaid";
 import { markdownComponents } from "./markdown-components";
+import { PreviewCodeBlock } from "./preview-code-block";
+
+const previewComponents: Components = {
+  ...markdownComponents,
+  pre({ children, node, ...props }) {
+    const codeChild = node?.children?.find(
+      (child): child is Element =>
+        child.type === "element" && child.tagName === "code",
+    );
+    if (codeChild) {
+      const classNames = codeChild.properties?.className;
+      if (
+        Array.isArray(classNames) &&
+        classNames.some(
+          (c) => typeof c === "string" && c.startsWith("language-"),
+        )
+      ) {
+        return <>{children}</>;
+      }
+    }
+    return <pre {...props}>{children}</pre>;
+  },
+  code({ children, className, ...props }) {
+    const match = /language-(\w+)/.exec(className || "");
+    if (match) {
+      return (
+        <PreviewCodeBlock
+          code={String(children).replace(/\n$/, "")}
+          lang={match[1]}
+        />
+      );
+    }
+    return (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    );
+  },
+};
 
 interface MarkdownPreviewProps {
   content: string;
@@ -21,7 +62,7 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSanitize, rehypeExtractMermaid]}
-        components={markdownComponents}
+        components={previewComponents}
       >
         {content}
       </Markdown>
