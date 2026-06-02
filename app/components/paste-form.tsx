@@ -13,7 +13,7 @@ export function PasteForm() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const [layout, setLayout] = useState<"split" | "preview">("split");
-  const [expiration, setExpiration] = useState("1d");
+  const [expiration, setExpiration] = useState("1m");
   const router = useRouter();
 
   const debouncedPreview = useDebounce(content, 300);

@@ -14,7 +14,7 @@ function buildFullUrl(request: NextRequest, path: string): string {
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get("content-type") ?? "";
   let expiration =
-    request.nextUrl.searchParams.get("expiration") ?? "never";
+    request.nextUrl.searchParams.get("expiration") ?? "1m";
 
   let content: string | null;
   if (contentType.includes("multipart/form-data")) {

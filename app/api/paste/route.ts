@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: contentError }, { status });
   }
 
-  const expirationValue = expiration ?? "never";
+  const expirationValue = expiration ?? "1m";
   const expirationError = validateExpiration(expirationValue);
   if (expirationError) {
     return NextResponse.json({ error: expirationError }, { status: 400 });
