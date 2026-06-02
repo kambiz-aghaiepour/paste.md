@@ -3,26 +3,31 @@ import { describe, it, expect } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import { remarkAlert } from "remark-github-blockquote-alert";
 import remarkRehype from "remark-rehype";
 import rehypeSanitize from "rehype-sanitize";
+import rehypeKatex from "rehype-katex";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeShiki from "@shikijs/rehype";
 import rehypeStringify from "rehype-stringify";
 import { rehypeExtractMermaid } from "../../app/lib/rehype-extract-mermaid";
+import { sanitizeSchema } from "../../app/lib/sanitize-schema";
+import { autolinkHeadingsOptions } from "../../app/lib/autolink-headings-options";
 
-/**
- * Processes Markdown through the same plugin pipeline as MarkdownRenderer:
- * remarkParse -> remarkGfm -> remarkRehype -> rehypeSanitize -> rehypeShiki -> rehypeStringify
- *
- * This mirrors the exact plugin ordering in app/components/markdown-renderer.tsx
- * (sanitize BEFORE shiki) to test the same code path without the React Server Component runtime.
- */
 async function processMarkdown(input: string): Promise<string> {
   const result = await unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkAlert)
     .use(remarkRehype)
-    .use(rehypeSanitize)
+    .use(rehypeSanitize, sanitizeSchema)
     .use(rehypeExtractMermaid)
+    .use(rehypeKatex)
+    .use(rehypeSlug)
+    .use(rehypeAutolinkHeadings, autolinkHeadingsOptions)
     .use(rehypeShiki, { themes: { light: "github-light", dark: "github-dark" }, defaultColor: "light" })
     .use(rehypeStringify)
     .process(input);
@@ -164,5 +169,87 @@ const greeting = "Hello, World!";
     // Because sanitize runs BEFORE shiki, Shiki's styling is preserved
     expect(output).toContain("<span");
     expect(output).toMatch(/style="color:/);
+  });
+
+  it("REND-04: renders inline math with KaTeX", async () => {
+    const input = "The formula $E=mc^2$ is famous.";
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain("katex");
+    expect(output).toContain("E");
+    expect(output).toContain("mc");
+  });
+
+  it("REND-04: renders block math with KaTeX", async () => {
+    const input = `$$
+\\sum_{i=1}^n i = \\frac{n(n+1)}{2}
+$$`;
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain("katex-display");
+    expect(output).toContain("frac");
+  });
+
+  it("REND-05: adds id attributes to headings", async () => {
+    const input = "## Hello World";
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain('<h2 id="hello-world"');
+  });
+
+  it("REND-05: adds anchor links to headings", async () => {
+    const input = "## Hello World";
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain('class="anchor"');
+    expect(output).toContain('href="#hello-world"');
+  });
+
+  it("REND-06: renders GitHub-style note alert", async () => {
+    const input = `> [!NOTE]
+> This is a note.`;
+
+    const output = await processMarkdown(input);
+
+    expect(output).toContain("markdown-alert");
+    expect(output).toContain("markdown-alert-note");
+    expect(output).toContain("This is a note.");
+  });
+
+  it("REND-06: renders all five alert types", async () => {
+    const types = ["NOTE", "TIP", "IMPORTANT", "WARNING", "CAUTION"];
+
+    for (const type of types) {
+      const input = `> [!${type}]\n> Alert content.`;
+      const output = await processMarkdown(input);
+      expect(output).toContain(`markdown-alert-${type.toLowerCase()}`);
+    }
+  });
+
+  it("REND-06: strips SVG icons from alerts (CSS provides icons instead)", async () => {
+    const input = `> [!NOTE]
+> Text.`;
+
+    const output = await processMarkdown(input);
+
+    expect(output).not.toContain("<svg");
+    expect(output).not.toContain("<path");
+  });
+
+  it("SECU-01: strips script tags inside alerts", async () => {
+    const input = `> [!NOTE]
+> Safe text
+>
+> <script>alert("xss")</script>`;
+
+    const output = await processMarkdown(input);
+
+    expect(output).not.toContain("<script");
+    expect(output).not.toContain("alert(");
+    expect(output).toContain("Safe text");
   });
 });

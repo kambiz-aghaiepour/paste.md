@@ -4,8 +4,15 @@ import type { Components } from "react-markdown";
 import type { Element } from "hast";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import { remarkAlert } from "remark-github-blockquote-alert";
 import rehypeSanitize from "rehype-sanitize";
+import rehypeKatex from "rehype-katex";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { rehypeExtractMermaid } from "@/app/lib/rehype-extract-mermaid";
+import { sanitizeSchema } from "@/app/lib/sanitize-schema";
+import { autolinkHeadingsOptions } from "@/app/lib/autolink-headings-options";
 import { markdownComponents } from "./markdown-components";
 import { PreviewCodeBlock } from "./preview-code-block";
 
@@ -60,8 +67,14 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
       aria-live="polite"
     >
       <Markdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize, rehypeExtractMermaid]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkAlert]}
+        rehypePlugins={[
+          [rehypeSanitize, sanitizeSchema],
+          rehypeExtractMermaid,
+          rehypeKatex,
+          rehypeSlug,
+          [rehypeAutolinkHeadings, autolinkHeadingsOptions],
+        ]}
         components={previewComponents}
       >
         {content}
