@@ -22,16 +22,16 @@ Upload any Markdown file with a single `curl` command:
 
 ```bash
 # Upload a file
-curl --data-binary @design-doc.md https://paste.md/api/paste/upload
+curl --data-binary @design-doc.md https://paste.rdu2.scalelab.redhat.com/api/paste/upload
 
 # Pipe from stdin
-echo "# Quick Note" | curl --data-binary @- https://paste.md/api/paste/upload
+echo "# Quick Note" | curl --data-binary @- https://paste.rdu2.scaclelab.redhat.com/api/paste/upload
 
 # Set an expiration (1h, 1d, 1w, 1m)
-curl --data-binary @meeting-notes.md "https://paste.md/api/paste/upload?expiration=1w"
+curl --data-binary @meeting-notes.md "https://paste.rdu2.scalelab.redhat.com/api/paste/upload?expiration=1w"
 
 # Download it back as .md
-curl -OJ https://paste.md/api/paste/{id}/download
+curl -OJ https://paste.rdu2.scalelab.redhat.com/api/paste/{id}/download
 ```
 
 You get back a URL. That's it. Share it, and whoever opens it sees your Markdown rendered beautifully — not raw text.
@@ -175,7 +175,7 @@ sequenceDiagram
     CLI->>API: POST /api/paste/upload
     API->>DB: INSERT paste
     DB-->>API: OK
-    API-->>CLI: https://paste.md/aB3x9kLm
+    API-->>CLI: https://paste.rdu2.scalelab.redhat.com/aB3x9kLm
     CLI-->>User: URL ready to share
 
     User->>API: GET /aB3x9kLm
@@ -362,7 +362,7 @@ volumes:
 
 ```bash
 # Create this file locally, then upload it
-curl --data-binary @showcase.md https://paste.md/api/paste/upload
+curl --data-binary @showcase.md https://paste.rdu2.scalelab.redhat.com/api/paste/upload
 ```
 
 That's it. No sign-up. No configuration. Just Markdown, rendered beautifully.
