@@ -5,6 +5,7 @@ import type { Element } from "hast";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import remarkGemoji from "remark-gemoji";
 import { remarkAlert } from "remark-github-blockquote-alert";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeKatex from "rehype-katex";
@@ -67,7 +68,7 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
       aria-live="polite"
     >
       <Markdown
-        remarkPlugins={[remarkGfm, remarkMath, remarkAlert]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkAlert, remarkGemoji]}
         rehypePlugins={[
           [rehypeSanitize, sanitizeSchema],
           rehypeExtractMermaid,

@@ -1,6 +1,7 @@
 import { MarkdownAsync } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import remarkGemoji from "remark-gemoji";
 import { remarkAlert } from "remark-github-blockquote-alert";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeKatex from "rehype-katex";
@@ -20,7 +21,7 @@ export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <article className="prose prose-gray dark:prose-invert max-w-none prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:p-0 prose-pre:overflow-x-auto prose-img:rounded-lg">
       <MarkdownAsync
-        remarkPlugins={[remarkGfm, remarkMath, remarkAlert]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkAlert, remarkGemoji]}
         rehypePlugins={[
           [rehypeSanitize, sanitizeSchema],
           rehypeExtractMermaid,
