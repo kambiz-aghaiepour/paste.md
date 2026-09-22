@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // `@marp-team/marp-core/browser` references browser globals (HTMLElement) at
 // module-evaluation time, so it must be loaded lazily inside the effect below
 // rather than statically imported (which would break server-side evaluation).
@@ -21,6 +21,9 @@ interface MarpViewerProps {
  * Marp browser helper required for auto-scaling / SVG polyfills.
  */
 export function MarpViewer({ html, total }: MarpViewerProps) {
+  // React compares this object by identity. Recreating it on navigation resets
+  // innerHTML and detaches the slides held by slidesRef (and Marp's helper).
+  const markup = useMemo(() => ({ __html: html }), [html]);
   const deckRef = useRef<HTMLDivElement>(null);
   const slidesRef = useRef<SVGElement[]>([]);
   const marpUpdateRef = useRef<(() => void) | null>(null);
@@ -36,7 +39,7 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
     marpUpdateRef.current?.();
   }, []);
 
-  // Set up the Marp browser helper + capture the slide list once on mount.
+  // Set up the Marp browser helper and capture the slides whenever the deck changes.
   useEffect(() => {
     const container = deckRef.current;
     if (!container) return;
@@ -44,9 +47,12 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
     // Slides are stable `<svg[data-marpit-svg]>` boundaries, so we can capture
     // and show them synchronously; the helper only upgrades elements inside.
     const slides = Array.from(
-      container.querySelectorAll<SVGElement>("svg[data-marpit-svg]"),
+      container.querySelectorAll<SVGElement>(
+        ":scope > .marpit > svg[data-marpit-svg]",
+      ),
     );
     slidesRef.current = slides;
+    setIndex(0);
     setSlideCount(slides.length);
     applyIndex(0);
 
@@ -78,8 +84,9 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
     return () => {
       cancelled = true;
       cleanup?.();
+      marpUpdateRef.current = null;
     };
-  }, [applyIndex]);
+  }, [html, applyIndex]);
 
   // Keep the visible slide in sync whenever the index changes.
   useEffect(() => {
@@ -88,14 +95,14 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
 
   const goTo = useCallback(
     (i: number) => {
-      setIndex((prev) => Math.max(0, Math.min(slideCount - 1, i)));
+      setIndex(Math.max(0, Math.min(slideCount - 1, i)));
     },
     [slideCount],
   );
 
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
   const next = useCallback(
-    () => setIndex((i) => Math.min(slideCount - 1, i + 1)),
+    () => setIndex((i) => Math.max(0, Math.min(slideCount - 1, i + 1))),
     [slideCount],
   );
 
@@ -145,7 +152,7 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
       <div
         ref={deckRef}
         className="marp-deck h-full w-full"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={markup}
       />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex items-center justify-center">

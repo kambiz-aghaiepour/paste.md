@@ -1,4 +1,5 @@
 import { Marp } from "@marp-team/marp-core";
+import { marpHtmlAllowList } from "../lib/marp-html";
 import { MarpViewer } from "./marp-viewer";
 
 interface MarpRendererProps {
@@ -13,15 +14,20 @@ interface MarpRendererProps {
  * interactive viewer / polyfill. The result is wrapped in a client `MarpViewer`
  * that handles slide navigation.
  *
- * Security: Marp Core applies its own default HTML allowlist (raw HTML is not
- * enabled), so user-authored markdown cannot inject `<script>` or unsafe tags.
+ * Security: extend Marp's HTML allowlist with filtered presentation styles and
+ * static SVG, preserving its filtering of scripts, event handlers and URLs.
  */
 export function MarpRenderer({ content }: MarpRendererProps) {
   // `script: false` disables the inline polyfill script that Marp injects by
   // default (it would not run under React anyway); the client viewer invokes
   // the `@marp-team/marp-core/browser` helper instead.
   // `math: "katex"` keeps math typesetting consistent with the document renderer.
-  const marp = new Marp({ script: false, math: "katex", minifyCSS: true });
+  const marp = new Marp({
+    script: false,
+    math: "katex",
+    minifyCSS: true,
+    html: marpHtmlAllowList,
+  });
   const { html, css } = marp.render(content);
 
   // Each slide is an `<svg data-marpit-svg …>` element. Count them on the server
