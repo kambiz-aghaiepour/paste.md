@@ -17,3 +17,15 @@ export function computeExpiresAt(
   if (seconds === null) return null;
   return createdAt + seconds;
 }
+
+export function expirationFromExpiresAt(
+  createdAt: number,
+  expiresAt: number | null,
+): string {
+  if (expiresAt === null) return "never";
+  const diff = expiresAt - createdAt;
+  for (const [key, seconds] of Object.entries(EXPIRATION_SECONDS)) {
+    if (seconds !== null && seconds === diff) return key;
+  }
+  return "never";
+}

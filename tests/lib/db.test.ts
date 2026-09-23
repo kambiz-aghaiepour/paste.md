@@ -1,6 +1,11 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { db } from "@/lib/db";
-import { createPaste, getPasteById, deleteExpiredPastes } from "@/lib/db/queries";
+import {
+  createPaste,
+  getPasteById,
+  deleteExpiredPastes,
+  updatePasteExpiration,
+} from "@/lib/db/queries";
 import { pastes } from "@/lib/db/schema";
 import { like } from "drizzle-orm";
 
@@ -113,5 +118,43 @@ describe("query functions", () => {
     const remaining = getPasteById("test-del2");
     expect(remaining).toBeDefined();
     expect(remaining!.content).toBe("not expired");
+  });
+
+  it("updatePasteExpiration updates the expiry of an existing paste", () => {
+    createPaste({
+      id: "test-exp1",
+      content: "expiry test",
+      createdAt: 500,
+      expiresAt: null,
+      sizeBytes: 11,
+    });
+
+    const updated = updatePasteExpiration("test-exp1", 5000);
+    expect(updated).toBe(true);
+
+    const updatedPaste = getPasteById("test-exp1");
+    expect(updatedPaste).toBeDefined();
+    expect(updatedPaste!.expiresAt).toBe(5000);
+  });
+
+  it("updatePasteExpiration sets expiresAt to null for never", () => {
+    createPaste({
+      id: "test-exp2",
+      content: "expiry test",
+      createdAt: 500,
+      expiresAt: 10000,
+      sizeBytes: 11,
+    });
+
+    const updated = updatePasteExpiration("test-exp2", null);
+    expect(updated).toBe(true);
+
+    const updatedPaste = getPasteById("test-exp2");
+    expect(updatedPaste).toBeDefined();
+    expect(updatedPaste!.expiresAt).toBeNull();
+  });
+
+  it("updatePasteExpiration returns false for a non-existent paste", () => {
+    expect(updatePasteExpiration("nonexistent", 5000)).toBe(false);
   });
 });

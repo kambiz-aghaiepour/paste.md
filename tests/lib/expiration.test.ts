@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { computeExpiresAt, VALID_EXPIRATIONS } from "@/lib/expiration";
+import {
+  computeExpiresAt,
+  VALID_EXPIRATIONS,
+  expirationFromExpiresAt,
+} from "@/lib/expiration";
 
 describe("expiration utility", () => {
   it("STOR-02: VALID_EXPIRATIONS contains all expected values", () => {
@@ -28,5 +32,18 @@ describe("expiration utility", () => {
 
   it("STOR-02: computeExpiresAt with invalid value returns null", () => {
     expect(computeExpiresAt(1000, "invalid")).toBeNull();
+  });
+});
+
+describe("expirationFromExpiresAt", () => {
+  it("returns never for null expiresAt", () => {
+    expect(expirationFromExpiresAt(1000, null)).toBe("never");
+  });
+
+  it("maps matching expiry durations back to their keys", () => {
+    expect(expirationFromExpiresAt(1000, 4600)).toBe("1h");
+    expect(expirationFromExpiresAt(1000, 87400)).toBe("1d");
+    expect(expirationFromExpiresAt(1000, 605800)).toBe("1w");
+    expect(expirationFromExpiresAt(1000, 2593000)).toBe("1m");
   });
 });

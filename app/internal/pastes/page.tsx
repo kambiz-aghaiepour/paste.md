@@ -1,5 +1,6 @@
 import { getAllPastes } from "@/lib/db/queries";
 import { DeletePasteButton } from "./delete-paste-button";
+import { ExpirationSelect } from "./expiration-select";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -8,23 +9,6 @@ function formatSize(bytes: number): string {
 
 function formatDate(unix: number): string {
   return new Date(unix * 1000).toISOString().replace("T", " ").slice(0, 19) + " UTC";
-}
-
-function formatExpiration(expiresAt: number | null): string {
-  if (expiresAt === null) return "Never";
-  const now = Math.floor(Date.now() / 1000);
-  const remaining = expiresAt - now;
-  if (remaining <= 0) return "Expired";
-  if (remaining < 3600) {
-    const minutes = Math.max(1, Math.round(remaining / 60));
-    return `${minutes}m`;
-  }
-  if (remaining < 86400) {
-    const hours = Math.round(remaining / 3600);
-    return `${hours}h`;
-  }
-  const days = Math.round(remaining / 86400);
-  return `${days}d`;
 }
 
 export default async function InternalPastesPage() {
@@ -65,8 +49,12 @@ export default async function InternalPastesPage() {
                   <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     {formatDate(paste.createdAt)}
                   </td>
-                  <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-300">
-                    {formatExpiration(paste.expiresAt)}
+                  <td className="py-2.5 pr-4">
+                    <ExpirationSelect
+                      pasteId={paste.id}
+                      createdAt={paste.createdAt}
+                      expiresAt={paste.expiresAt}
+                    />
                   </td>
                   <td className="py-2.5 pr-4 text-right text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     {formatSize(paste.sizeBytes)}
