@@ -13,6 +13,10 @@ Built with Next.js 16, React 19, SQLite, and server-side syntax highlighting via
 - Rate limiting
 - XSS protection via rehype-sanitize and Content Security Policy headers
 - Zero client-side JavaScript for paste viewing (Server Components)
+- **Marp presentations**: pastes with a `marp: true` frontmatter render as
+  interactive slide decks (keyboard + fullscreen navigation). Force a view with
+  a URL suffix — `.marp` for slides, `.md` for the document — without changing
+  the core `/id` URL format.
 
 ## Prerequisites
 

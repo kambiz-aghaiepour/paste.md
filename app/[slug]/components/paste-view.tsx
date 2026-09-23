@@ -4,9 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { CopyButton } from "@/app/components/copy-button";
 
+type Tab = "presentation" | "document" | "raw";
+
 interface PasteViewProps {
   content: string;
   renderedContent: React.ReactNode;
+  /** Optional Marp slides. When present, a "Presentation" tab is shown. */
+  presentationContent?: React.ReactNode;
+  defaultTab?: Tab;
   expiresAt: number | null;
 }
 
@@ -14,8 +19,21 @@ interface PasteViewProps {
  * Client Component wrapping server-rendered paste content.
  * Injects copy buttons into pre elements via DOM after hydration (D-09).
  */
-export function PasteView({ content, renderedContent }: PasteViewProps) {
-  const [activeTab, setActiveTab] = useState<"rendered" | "raw">("rendered");
+export function PasteView({
+  content,
+  renderedContent,
+  presentationContent,
+  defaultTab,
+}: PasteViewProps) {
+  const hasPresentation = Boolean(presentationContent);
+  const tabs: Tab[] = hasPresentation
+    ? ["presentation", "document", "raw"]
+    : ["document", "raw"];
+
+  const initialTab: Tab =
+    defaultTab && tabs.includes(defaultTab) ? defaultTab : "document";
+
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const contentRef = useRef<HTMLDivElement>(null);
   const rootsRef = useRef<Root[]>([]);
 
@@ -39,14 +57,13 @@ export function PasteView({ content, renderedContent }: PasteViewProps) {
       wrapper.appendChild(buttonContainer);
 
       const root = createRoot(buttonContainer);
-      root.render(
-        <CopyButton textContent={pre.textContent ?? ""} />,
-      );
+      root.render(<CopyButton textContent={pre.textContent ?? ""} />);
       rootsRef.current.push(root);
     }
 
-    const mermaidDiagrams =
-      container.querySelectorAll<HTMLElement>("[data-mermaid-source]");
+    const mermaidDiagrams = container.querySelectorAll<HTMLElement>(
+      "[data-mermaid-source]",
+    );
 
     for (const diagram of mermaidDiagrams) {
       if (diagram.parentElement?.classList.contains("relative")) continue;
@@ -75,38 +92,41 @@ export function PasteView({ content, renderedContent }: PasteViewProps) {
     };
   }, [activeTab]);
 
+  const tabLabels: Record<Tab, string> = {
+    presentation: "Presentation",
+    document: "Rendered",
+    raw: "Raw",
+  };
+
   return (
     <div>
       <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-4">
-        <button
-          type="button"
-          onClick={() => setActiveTab("rendered")}
-          aria-pressed={activeTab === "rendered"}
-          className={`flex-1 py-2 text-sm font-medium text-center min-h-[44px] transition-colors ${
-            activeTab === "rendered"
-              ? "bg-blue-600 text-white"
-              : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300"
-          }`}
-        >
-          Rendered
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("raw")}
-          aria-pressed={activeTab === "raw"}
-          className={`flex-1 py-2 text-sm font-medium text-center min-h-[44px] transition-colors ${
-            activeTab === "raw"
-              ? "bg-blue-600 text-white"
-              : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300"
-          }`}
-        >
-          Raw
-        </button>
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            aria-pressed={activeTab === tab}
+            className={`flex-1 py-2 text-sm font-medium text-center min-h-[44px] transition-colors ${
+              activeTab === tab
+                ? "bg-blue-600 text-white"
+                : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+            }`}
+          >
+            {tabLabels[tab]}
+          </button>
+        ))}
       </div>
 
-      {activeTab === "rendered" ? (
+      {activeTab === "presentation" && presentationContent ? (
+        <div>{presentationContent}</div>
+      ) : null}
+
+      {activeTab === "document" ? (
         <div ref={contentRef}>{renderedContent}</div>
-      ) : (
+      ) : null}
+
+      {activeTab === "raw" ? (
         <div className="relative group">
           <pre className="whitespace-pre-wrap break-words rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 p-4 font-mono text-sm">
             {content}
@@ -115,7 +135,7 @@ export function PasteView({ content, renderedContent }: PasteViewProps) {
             <CopyButton textContent={content} />
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

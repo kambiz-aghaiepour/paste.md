@@ -180,3 +180,54 @@ html.dark .markdown-alert-caution {
 html.dark .markdown-alert-caution .markdown-alert-title {
   color: #f85149;
 }
+
+/* ---------------------------------------------------------------------------
+ * Marp presentation stage
+ * ------------------------------------------------------------------------- */
+
+/* The outer stage fills the available viewport and rounds its corners. The
+ * 16:9 slides letterbox inside it (Marp uses preserveAspectRatio="meet"). */
+[data-marp-presentation] {
+  position: relative;
+  width: 100%;
+  height: calc(100dvh - 9rem);
+  min-height: 480px;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background-color: #f3f4f6;
+  color-scheme: light;
+}
+
+html.dark [data-marp-presentation] {
+  background-color: #111827;
+  color-scheme: dark;
+}
+
+/* Let the injected `.marpit` deck fill the stage. */
+[data-marp-presentation] .marp-deck,
+[data-marp-presentation] .marp-deck .marpit {
+  height: 100%;
+  width: 100%;
+}
+
+/* Override Marp's default 100vw/100vh slide sizing so slides fit the stage.
+ * `!important` guards against the theme's `div.marpit > svg[data-marpit-svg]`
+ * rule. Each slide is a single `svg[data-marpit-svg]` element. */
+[data-marp-presentation] .marp-deck .marpit > svg[data-marpit-svg] {
+  height: 100% !important;
+  width: 100% !important;
+  display: block;
+}
+
+/* Show only the first slide during SSR until the client viewer hydrates and
+ * toggles visibility. Inline styles in the viewer override this rule. */
+[data-marp-presentation] .marp-deck .marpit > svg[data-marpit-svg] + svg[data-marpit-svg] {
+  display: none;
+}
+
+/* When the stage goes fullscreen, drop the header offset so the deck fills the
+ * screen exactly. */
+[data-marp-presentation]:fullscreen {
+  height: 100dvh;
+  border-radius: 0;
+}

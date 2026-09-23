@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPasteById } from "@/lib/db/queries";
+import {
+  isMarpDeck,
+  parsePasteIdAndView,
+  extractFrontmatterTitle,
+} from "@/lib/marp";
 import { MarkdownRenderer } from "@/app/components/markdown-renderer";
+import { MarpRenderer } from "@/app/components/marp-renderer";
 import { PasteView } from "./components/paste-view";
 
 function formatRelativeTime(seconds: number): string {
@@ -17,14 +24,34 @@ function formatRelativeTime(seconds: number): string {
   return `${days} day${days !== 1 ? "s" : ""}`;
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { id } = parsePasteIdAndView(slug);
+  const paste = getPasteById(id);
+  if (!paste) return {};
+
+  const title = extractFrontmatterTitle(paste.content);
+  if (title) return { title };
+
+  const firstHeading = paste.content.match(/^#\s+(.+)$/m)?.[1];
+  if (firstHeading) return { title: firstHeading.trim() };
+
+  return {};
+}
+
 export default async function PastePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const { id, forcedView } = parsePasteIdAndView(slug);
 
-  const paste = getPasteById(slug);
+  const paste = getPasteById(id);
   if (!paste) {
     notFound();
   }
@@ -52,11 +79,24 @@ export default async function PastePage({
 
   const remaining = paste.expiresAt ? paste.expiresAt - now : null;
 
+  // Marp decks auto-render as presentations; the `.marp` / `.md` suffixes let a
+  // pasted URL force a specific view without changing the core `/id` format.
+  const isMarp = isMarpDeck(paste.content);
+  const showPresentation = isMarp || forcedView === "presentation";
+  const defaultTab =
+    forcedView ?? (showPresentation ? "presentation" : "document");
+
   return (
     <main className="mx-auto max-w-7xl p-4 sm:p-8">
       <PasteView
         content={paste.content}
         renderedContent={<MarkdownRenderer content={paste.content} />}
+        presentationContent={
+          showPresentation ? (
+            <MarpRenderer content={paste.content} />
+          ) : undefined
+        }
+        defaultTab={defaultTab}
         expiresAt={paste.expiresAt}
       />
       <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
