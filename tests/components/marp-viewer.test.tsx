@@ -1,13 +1,19 @@
 // @vitest-environment jsdom
 import { Marp } from "@marp-team/marp-core";
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { StrictMode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MarpViewer } from "../../app/components/marp-viewer";
 
 vi.mock("@marp-team/marp-core/browser", () => ({
   default: () => ({ update: vi.fn(), cleanup: vi.fn() }),
 }));
+
+// The viewer keeps the URL fragment in sync with the visible slide, so reset
+// the address bar between tests to avoid cross-test contamination.
+afterEach(() => {
+  window.history.replaceState(null, "", "/");
+});
 
 const deck = new Marp({ script: false }).render(
   "# First\n\n---\n\n# Second\n\n---\n\n# Third",
@@ -105,5 +111,46 @@ describe("Marp slide navigation", () => {
       (getByRole("button", { name: "Previous slide" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
+  });
+});
+
+describe("Marp URL fragment (`#<n>`) navigation", () => {
+  it("opens on the slide referenced by the URL fragment", () => {
+    window.location.hash = "#2";
+    const { getByText } = render(<MarpViewer html={deck} total={3} />);
+    expect(getByText("2 / 3")).toBeDefined();
+  });
+
+  it("clamps an out-of-range slide number to the last slide", () => {
+    window.location.hash = "#99";
+    const { getByText } = render(<MarpViewer html={deck} total={3} />);
+    expect(getByText("3 / 3")).toBeDefined();
+  });
+
+  it("ignores a non-numeric fragment and sits on the first slide", () => {
+    window.location.hash = "#summary";
+    const { getByText } = render(<MarpViewer html={deck} total={3} />);
+    expect(getByText("1 / 3")).toBeDefined();
+  });
+
+  it("updates the URL fragment as the slide changes", () => {
+    const { getByRole } = render(<MarpViewer html={deck} total={3} />);
+    expect(window.location.hash).toBe("");
+    fireEvent.click(getByRole("button", { name: "Next slide" }));
+    expect(window.location.hash).toBe("#2");
+    fireEvent.click(getByRole("button", { name: "Next slide" }));
+    expect(window.location.hash).toBe("#3");
+  });
+
+  it("jumps to the slide when the fragment changes in the address bar", () => {
+    const { getByText } = render(<MarpViewer html={deck} total={3} />);
+    expect(getByText("1 / 3")).toBeDefined();
+    // Setting the hash updates location.hash and fires a `hashchange`; dispatch
+    // one explicitly inside `act` so the re-render flushes before the assertion.
+    act(() => {
+      window.location.hash = "#3";
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(getByText("3 / 3")).toBeDefined();
   });
 });

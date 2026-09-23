@@ -14,6 +14,23 @@ interface MarpViewerProps {
 }
 
 /**
+ * Resolve a `#<n>` URL fragment to a zero-based slide index, clamped to the
+ * deck size. Slide numbers in the fragment are 1-indexed, matching the
+ * "N / total" counter. Returns null when there is no fragment or it isn't a
+ * valid slide number (so callers can fall back to the first slide).
+ */
+function slideIndexFromHash(slideCount: number): number | null {
+  if (typeof window === "undefined") return null;
+  const match = window.location.hash.match(/^#(\d+)$/);
+  if (!match) return null;
+  const slideNumber = Number.parseInt(match[1], 10);
+  if (!Number.isSafeInteger(slideNumber) || slideNumber < 1 || slideCount <= 0) {
+    return null;
+  }
+  return Math.min(slideNumber - 1, slideCount - 1);
+}
+
+/**
  * Interactive slide viewer for a Marp presentation.
  *
  * Receives the pre-rendered inline-SVG slides (served by `MarpRenderer`) and
@@ -27,6 +44,9 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
   const deckRef = useRef<HTMLDivElement>(null);
   const slidesRef = useRef<SVGElement[]>([]);
   const marpUpdateRef = useRef<(() => void) | null>(null);
+  // Tracks the deck markup the setup effect last saw, so a fresh mount honors a
+  // `#<n>` fragment while a content replacement resets to the first slide.
+  const prevHtmlRef = useRef<string | undefined>(undefined);
   const [index, setIndex] = useState(0);
   const [slideCount, setSlideCount] = useState(total ?? 0);
 
@@ -52,9 +72,20 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
       ),
     );
     slidesRef.current = slides;
-    setIndex(0);
+
+    // Open on the slide referenced by a `#<n>` fragment on first mount; reset to
+    // the first slide when the deck content is replaced. Tracked per html value
+    // so Strict Mode's double-mount is idempotent.
+    const replaced =
+      prevHtmlRef.current !== undefined && prevHtmlRef.current !== html;
+    prevHtmlRef.current = html;
+    const initialIndex = replaced
+      ? 0
+      : (slideIndexFromHash(slides.length) ?? 0);
+
     setSlideCount(slides.length);
-    applyIndex(0);
+    setIndex(initialIndex);
+    applyIndex(initialIndex);
 
     let cancelled = false;
     let cleanup: (() => void) | undefined;
@@ -134,6 +165,33 @@ export function MarpViewer({ html, total }: MarpViewerProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, goTo, slideCount]);
+
+  // Jump to the slide referenced by a `#<n>` fragment whenever the address bar
+  // changes (shared link, back/forward, or a manual edit).
+  useEffect(() => {
+    const onHashChange = () => {
+      const target = slideIndexFromHash(slideCount);
+      if (target !== null) setIndex(target);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [slideCount]);
+
+  // Keep the URL fragment in sync with the visible slide so the current slide
+  // can be shared directly. `replaceState` avoids a history entry per slide,
+  // and we skip rewriting a bare paste URL to "#1" on first load.
+  useEffect(() => {
+    if (slideCount === 0) return;
+    const hash = `#${index + 1}`;
+    const currentHash = window.location.hash;
+    if (currentHash === hash) return;
+    if (currentHash === "" && index === 0) return;
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}${hash}`,
+    );
+  }, [index, slideCount]);
 
   const toggleFullscreen = useCallback(() => {
     // Fullscreen the outer `[data-marp-presentation]` stage so the `:fullscreen`

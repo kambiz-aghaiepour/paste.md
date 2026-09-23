@@ -16,7 +16,9 @@ Built with Next.js 16, React 19, SQLite, and server-side syntax highlighting via
 - **Marp presentations**: pastes with a `marp: true` frontmatter render as
   interactive slide decks (keyboard + fullscreen navigation). Force a view with
   a URL suffix — `.marp` for slides, `.md` for the document — without changing
-  the core `/id` URL format.
+  the core `/id` URL format. Link directly to a slide by appending `#<n>`
+  (e.g. `/abc123#3` opens on slide 3); the fragment updates as you navigate so
+  the current slide is always shareable.
 
 ## Prerequisites
 
