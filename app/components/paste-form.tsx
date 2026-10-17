@@ -14,6 +14,7 @@ export function PasteForm() {
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const [layout, setLayout] = useState<"split" | "preview">("split");
   const [expiration, setExpiration] = useState("1m");
+  const [name, setName] = useState("");
   const router = useRouter();
 
   const debouncedPreview = useDebounce(content, 300);
@@ -49,7 +50,11 @@ export function PasteForm() {
       const res = await fetch("/api/paste", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, expiration }),
+        body: JSON.stringify({
+          content,
+          expiration,
+          name: name.trim() || undefined,
+        }),
       });
 
       if (!res.ok) {
@@ -159,6 +164,15 @@ export function PasteForm() {
         </p>
       )}
       <div className="flex items-center gap-4 flex-wrap">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Custom paste name (optional)"
+          aria-label="Custom paste name"
+          disabled={submitting}
+          className="w-full sm:w-auto rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        />
         <select
           value={expiration}
           onChange={(e) => setExpiration(e.target.value)}

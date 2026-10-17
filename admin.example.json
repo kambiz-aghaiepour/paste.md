@@ -1,0 +1,5 @@
+{
+  "username": "admin",
+  "password": "change-me",
+  "sessionSecret": "replace-with-a-random-secret"
+}

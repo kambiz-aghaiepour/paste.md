@@ -1,6 +1,9 @@
+import { redirect } from "next/navigation";
 import { getAllPastes } from "@/lib/db/queries";
 import { DeletePasteButton } from "./delete-paste-button";
 import { ExpirationSelect } from "./expiration-select";
+import { RenamePaste } from "./rename-paste";
+import { getSessionFromCookies, isUsernameAuthorized } from "@/lib/session";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -12,6 +15,11 @@ function formatDate(unix: number): string {
 }
 
 export default async function InternalPastesPage() {
+  const session = await getSessionFromCookies();
+  if (!session || !isUsernameAuthorized(session)) {
+    redirect("/login");
+  }
+
   const pastes = getAllPastes();
 
   return (
@@ -32,6 +40,7 @@ export default async function InternalPastesPage() {
                 <th className="py-3 pr-4">Created</th>
                 <th className="py-3 pr-4">Expires</th>
                 <th className="py-3 pr-4 text-right">Size</th>
+                <th className="py-3 pr-4">Rename</th>
                 <th className="py-3 w-12"></th>
               </tr>
             </thead>
@@ -58,6 +67,9 @@ export default async function InternalPastesPage() {
                   </td>
                   <td className="py-2.5 pr-4 text-right text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     {formatSize(paste.sizeBytes)}
+                  </td>
+                  <td className="py-2.5 pr-4">
+                    <RenamePaste pasteId={paste.id} />
                   </td>
                   <td className="py-2.5 text-center">
                     <DeletePasteButton pasteId={paste.id} />

@@ -4,6 +4,10 @@ import { THEME_SCRIPT } from "@/lib/theme-script-content";
 export async function ThemeScript() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+    <script
+      nonce={nonce}
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+    />
   );
 }

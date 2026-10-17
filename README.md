@@ -19,6 +19,11 @@ Built with Next.js 16, React 19, SQLite, and server-side syntax highlighting via
   the core `/id` URL format. Link directly to a slide by appending `#<n>`
   (e.g. `/abc123#3` opens on slide 3); the fragment updates as you navigate so
   the current slide is always shareable.
+- **Custom paste names**: create a paste at a friendly URL
+  (`/<custom-name>`) from the web editor, the JSON API, or `curl`
+- **Admin login & internal dashboard**: a custom login page protects the
+  internal paste-management dashboard (list, expiration edit, rename,
+  delete) with the admin account configured in `admin.json`
 
 ## Prerequisites
 
@@ -350,12 +355,70 @@ sudo systemctl restart paste-md
 
 If using `ProtectSystem=strict` in the systemd unit (the default), ensure `ReadWritePaths=/opt/paste-md/data` is present in the service file.
 
+## Admin login and internal dashboard
+
+The admin account is configured in a JSON file next to the application root
+(`<project>/admin.json`, e.g. `/opt/paste-md/admin.json`):
+
+```bash
+cp admin.example.json admin.json
+# edit username, password, and sessionSecret
+```
+
+| Field | Description |
+|-------|-------------|
+| `username` | Admin username |
+| `password` | Admin password |
+| `sessionSecret` | Secret used to sign the session cookie (generate one, e.g. `python3 -c "import secrets; print(secrets.token_urlsafe(32))"`) |
+
+`admin.json` is git-ignored. The path can be overridden with the
+`ADMIN_CONFIG_PATH` environment variable.
+
+Once configured, a **Login** link appears in the header next to the theme
+toggle. Logging in (custom `/login` page — no browser popup) sets a signed,
+httpOnly session cookie (7 days) and unlocks:
+
+- **Pastes / Logout** links in the header
+- **`/internal/pastes`** — the internal dashboard listing every paste with
+  editable expiration, rename (`Rename...` field per row), and delete. Any
+  unauthenticated access to `/internal/pastes` (or the admin server actions,
+  or `DELETE /api/cleanup`) redirects to `/login`.
+
+## Custom paste names (API)
+
+Pastes can be created under a custom name with the JSON API:
+
+```bash
+curl -X POST https://paste.example.com/api/paste \
+  -H "Content-Type: application/json" \
+  -d '{"content": "# Hello", "expiration": "1w", "name": "hello-world"}'
+# => {"id":"hello-world","url":"/hello-world"}
+```
+
+The `curl`-friendly upload endpoint accepts the same fields as JSON, a
+multipart `name` field, or a `?name=` query parameter:
+
+```bash
+curl -X POST https://paste.example.com/api/paste/upload \
+  -H "Content-Type: application/json" \
+  -d '{"content": "# Hello", "expiration": "never", "name": "hello-world"}'
+```
+
+Rules: names may contain letters, numbers, dots, underscores and dashes
+(max 64 characters), must not collide with an existing paste (409), and
+reserved names (`login`, `logout`, `internal`, `api`, `_next`,
+`favicon.ico`, `robots.txt`) are rejected. The web editor also exposes a
+"Custom paste name (optional)" field next to the expiration selector.
+
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3000` | Port the server listens on |
 | `NODE_ENV` | `development` | Set to `production` for deployments |
+| `ADMIN_CONFIG_PATH` | `./admin.json` | Path to the admin account configuration file |
+| `SESSION_COOKIE_SECURE` | unset | Set to `true` to mark the session cookie `Secure` (HTTPS deployments) |
+| `CLEANUP_SECRET` | unset | Bearer token for `DELETE /api/cleanup` (expired-paste purge) when called without an admin session |
 
 ## License
 

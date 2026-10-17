@@ -16,3 +16,6 @@ drizzle/
 # misc
 *.tsbuildinfo
 next-env.d.ts
+
+# admin credentials (local dev)
+admin.json

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import {
   validateContent,
   validateExpiration,
+  validatePasteName,
   persistPaste,
+  PasteNameConflictError,
 } from "@/lib/paste-service";
 
 export async function POST(request: Request) {
@@ -13,9 +15,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { content, expiration } = body as {
+  const { content, expiration, name } = body as {
     content?: string;
     expiration?: string;
+    name?: string;
   };
 
   const contentError = validateContent(content);
@@ -30,6 +33,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: expirationError }, { status: 400 });
   }
 
-  const result = persistPaste(content!, expirationValue);
-  return NextResponse.json(result, { status: 201 });
+  const nameError = validatePasteName(name);
+  if (nameError) {
+    return NextResponse.json({ error: nameError }, { status: 400 });
+  }
+
+  try {
+    const result = persistPaste(content!, expirationValue, name?.trim());
+    return NextResponse.json(result, { status: 201 });
+  } catch (err: unknown) {
+    if (err instanceof PasteNameConflictError) {
+      return NextResponse.json({ error: err.message }, { status: 409 });
+    }
+    throw err;
+  }
 }

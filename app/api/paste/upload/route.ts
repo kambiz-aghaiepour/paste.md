@@ -2,7 +2,9 @@ import { NextRequest } from "next/server";
 import {
   validateContent,
   validateExpiration,
+  validatePasteName,
   persistPaste,
+  PasteNameConflictError,
 } from "@/lib/paste-service";
 
 function buildFullUrl(request: NextRequest, path: string): string {
@@ -11,13 +13,34 @@ function buildFullUrl(request: NextRequest, path: string): string {
   return `${proto}://${host}${path}`;
 }
 
+function fail(message: string, status: number): Response {
+  return new Response(message + "\n", { status });
+}
+
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get("content-type") ?? "";
   let expiration =
     request.nextUrl.searchParams.get("expiration") ?? "1m";
+  let name: string | null =
+    request.nextUrl.searchParams.get("name") ?? null;
 
   let content: string | null;
-  if (contentType.includes("multipart/form-data")) {
+  if (contentType.includes("application/json")) {
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return fail("Invalid JSON", 400);
+    }
+    const json = body as {
+      content?: string;
+      expiration?: string;
+      name?: string;
+    };
+    content = json.content ?? null;
+    if (json.expiration) expiration = json.expiration;
+    if (json.name) name = json.name;
+  } else if (contentType.includes("multipart/form-data")) {
     const formData = await request.formData();
     const file = formData.get("file");
     if (file instanceof File) {
@@ -33,26 +56,40 @@ export async function POST(request: NextRequest) {
     ) {
       expiration = formExpiration;
     }
+    const formName = formData.get("name");
+    if (typeof formName === "string" && formName.trim()) {
+      name = formName;
+    }
   } else {
     content = await request.text();
   }
 
   const contentError = validateContent(content);
   if (contentError) {
-    const status = contentError.includes("512KB") ? 413 : 400;
-    return new Response(contentError + "\n", { status });
+    return fail(contentError, contentError.includes("512KB") ? 413 : 400);
   }
 
   const expirationError = validateExpiration(expiration);
   if (expirationError) {
-    return new Response(expirationError + "\n", { status: 400 });
+    return fail(expirationError, 400);
   }
 
-  const result = persistPaste(content!, expiration);
-  const fullUrl = buildFullUrl(request, result.url);
+  const nameError = validatePasteName(name);
+  if (nameError) {
+    return fail(nameError, 400);
+  }
 
-  return new Response(fullUrl + "\n", {
-    status: 201,
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+  try {
+    const result = persistPaste(content!, expiration, name?.trim() ?? undefined);
+    const fullUrl = buildFullUrl(request, result.url);
+    return new Response(fullUrl + "\n", {
+      status: 201,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  } catch (err: unknown) {
+    if (err instanceof PasteNameConflictError) {
+      return fail(err.message, 409);
+    }
+    throw err;
+  }
 }
